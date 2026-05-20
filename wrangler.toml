@@ -1,0 +1,27 @@
+name = "expense-echo"
+main = "src/index.ts"
+compatibility_date = "2026-05-20"
+compatibility_flags = ["nodejs_compat"]
+
+# Workers AI binding（Llama 3.2 Vision 等模型）
+[ai]
+binding = "AI"
+
+# D1 SQLite database
+[[d1_databases]]
+binding = "DB"
+database_name = "expense-echo-db"
+database_id = "REPLACE_WITH_REAL_ID_AFTER_wrangler_d1_create"
+
+# R2 object storage（收據圖片暫存）
+[[r2_buckets]]
+binding = "RECEIPTS"
+bucket_name = "expense-echo-receipts"
+
+# 環境變數（公開、可進 git）
+[vars]
+APP_NAME = "Expense Echo"
+
+# LINE secrets 走 wrangler secret put：
+#   LINE_CHANNEL_SECRET
+#   LINE_CHANNEL_ACCESS_TOKEN
