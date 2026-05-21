@@ -1,14 +1,15 @@
 {
   "name": "expense-echo",
-  "version": "0.0.1",
-  "description": "LINE 上的記帳 chatbot、跑在 Cloudflare 全家桶",
+  "version": "0.1.0",
+  "description": "LL 全 CF 全家桶 + 會員制練手場、終局收進 II dashboard",
   "private": true,
   "scripts": {
-    "dev": "wrangler dev",
-    "deploy": "wrangler deploy",
+    "dev": "wrangler pages dev public",
     "typecheck": "tsc --noEmit",
-    "db:init": "wrangler d1 execute expense-echo-db --file=./schema.sql",
-    "db:init:remote": "wrangler d1 execute expense-echo-db --remote --file=./schema.sql"
+    "db:create": "wrangler d1 create expense-echo-db",
+    "db:init:local": "wrangler d1 execute expense-echo-db --local --file=./schema.sql",
+    "db:init:remote": "wrangler d1 execute expense-echo-db --remote --file=./schema.sql",
+    "r2:create": "wrangler r2 bucket create expense-echo-receipts"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20240909.0",

@@ -1,5 +1,11 @@
 # 本機開發環境變數（複製成 .dev.vars、實際填值、不要進 git）
-# 部署到 production 請改用 `wrangler secret put <NAME>`
+# 部署到 production 走 CF Pages dashboard → Settings → Environment Variables → Encrypted
 
-LINE_CHANNEL_SECRET=replace-me
-LINE_CHANNEL_ACCESS_TOKEN=replace-me
+# Google OAuth（LL 共用一張「LeafLune SSO」）
+# 申請：https://console.cloud.google.com/ → APIs & Services → Credentials → OAuth Client ID
+GOOGLE_CLIENT_ID=replace-me.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=replace-me
+
+# Session cookie 簽章用、隨機 64 chars
+# 產生：node -e "console.log(crypto.randomBytes(32).toString('hex'))"
+SESSION_COOKIE_SECRET=replace-me

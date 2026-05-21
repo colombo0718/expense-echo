@@ -24,6 +24,7 @@ export async function parseTextExpense(text: string, env: Env): Promise<ParsedEx
         { role: 'system', content: SYSTEM_PROMPT },
         { role: 'user', content: text },
       ],
+      temperature: 0,
       max_tokens: 256,
     } as any);
 

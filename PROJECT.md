@@ -1,46 +1,69 @@
 # PROJECT.md — Expense Echo（消費回響）
 
+## 別名 / 搜尋關鍵字
+
+- `expense-echo`（repo 名）/ `expenseecho`（CF Pages 專案名）
+- `EE`（雙字母代號）
+- `記帳`、`收據`、`vision`、`消費回響`（功能脈絡）
+
+---
+
 ## 這是什麼
 
-LINE 記帳 chatbot、定位 LL 宇宙 **EE 子品牌**。
+**LL 第一個全 CF 全家桶 + 會員制練手場**。
 
-兩個價值：
-1. **對外**：個人記帳工具、免費版自己記、會員版有歷史關係性回饋（「上次跟女友去 Costco 花了多少」）
-2. **對內**：LL 正式遷往 Cloudflare 全家桶前的技術原型、所有 deploy pattern 之後可複製到 II / 葉衍君 / 任一新專案
+對外：web 記帳工具，拍收據 / 講一句話 / 自動入帳，未來收進 II dashboard 當會員小彩蛋。
+對內：CF Pages + Functions + D1 + R2 + Workers AI + Google OAuth 一條龍走通、所有 pattern 之後搬到 II Phase 1。
 
-跟 II 的關係：概念上屬 II（user-facing 個人資料軸）、實作上獨立 repo。II 成熟後納入或整合、看屆時情況。
+**終局定位**：EE 不獨立成子品牌、最終收進 II dashboard 當會員彩蛋功能。獨立 repo 只為練手時隔離爆炸範圍。
+
+---
+
+## 三重價值
+
+| 對 | 價值 |
+|---|---|
+| **元智生資課期末報告** | Vision-language 模型 OCR + 理解 + 分類 demo + 壓測流程 + controlled prompt perturbation 分析 |
+| **LL 內部 CF 練手** | 第一個全 CF 試點、deploy / binding / OAuth / session 全 pattern 之後可複製 |
+| **LL 會員制先行者** | Google OAuth + D1 session + cookie 雙模式先在 EE 走通、II Phase 1 直接拷貝 |
 
 ---
 
 ## 部署方式
 
-- **平台**：Cloudflare 全家桶（Workers + D1 + R2 + Workers AI）
-- **入口**：`*.workers.dev`（之後可掛 `ee.leaflune.org`）
-- **CI/CD**：Workers 直接 `wrangler deploy`、Pages 用 git push 觸發
+- **平台**：Cloudflare Pages（前端 + Functions）+ D1 + R2 + Workers AI
+- **URL**：`https://expenseecho.pages.dev`（未來收進 II 後改 `ee.leaflune.org` 或直接合進 `id.leaflune.org/dashboard`）
+- **CI/CD**：git push → CF Pages 自動部署、不需本機 wrangler
 
 ---
 
 ## 架構概覽
 
 ```
-LINE User
-  │ 推訊息（圖片 / 文字）
+未登入用戶
+  │ 開 expenseecho.pages.dev
   ▼
-LINE Messaging API webhook
-  │ POST /callback
+public/login.html — 「用 Google 登入」按鈕
+  │ 點 → /api/auth/google-start
   ▼
-Cloudflare Worker（src/index.ts）
+Google OAuth Consent（品牌：LeafLune）
+  │ 用戶授權後回 redirect
+  ▼
+/api/auth/google-callback
+  │ 換 token → 拉 userinfo → upsert users → 建 sessions → set cookie
+  ▼
+public/index.html（已登入主頁）
   │
-  ├─ 圖片 → R2 暫存 → Workers AI（Llama 3.2 Vision）
-  │   └─ 抽出 { 店家, 日期, 總額, 品項 } JSON
+  ├─ 文字記帳：app.js POST /api/parse-text
+  │   └─ Workers AI text → parse → D1 expenses
   │
-  ├─ 文字 → Workers AI（Llama 3.x text）解析
-  │   └─ 抽出 { 品項, 金額, 分類 }
+  ├─ 圖片記帳：app.js POST /api/parse-image（multipart）
+  │   └─ R2 暫存 → Workers AI Vision → parse → D1 expenses
   │
-  ├─ D1 寫入 expenses 表
-  │
-  └─ LINE Reply / Push API 回應
+  └─ 每次 AI 呼叫寫 ai_runs metrics（期末壓測用）
 ```
+
+未登入 access 任何 `/api/*` → 401。所有 API 從 session cookie 取 user_id、無 cookie 直接拒。
 
 ---
 
@@ -48,82 +71,128 @@ Cloudflare Worker（src/index.ts）
 
 ```
 expense-echo/
-├── src/
-│   ├── index.ts         # Worker 入口、LINE webhook 路由
-│   ├── line.ts          # LINE API client（reply / push / 下載 image）
-│   ├── vision.ts        # Workers AI 視覺呼叫 + JSON 抽取
-│   ├── text.ts          # 文字訊息解析
-│   ├── db.ts            # D1 query 封裝
-│   └── types.ts         # 共用型別
-├── schema.sql           # D1 表結構
-├── wrangler.toml        # Workers 設定（含 AI / D1 / R2 binding）
+├── docs/
+│   └── web-oauth-pivot.md          # 施工計畫
+├── public/                         # 靜態前端（Pages 自動 serve）
+│   ├── index.html                  # 主頁（需登入）
+│   ├── login.html                  # 登入頁
+│   ├── app.js                      # 前端互動
+│   └── styles.css
+├── functions/                      # Pages Functions（filesystem routing）
+│   └── api/
+│       ├── auth/
+│       │   ├── google-start.ts     # 產 OAuth URL + state cookie
+│       │   ├── google-callback.ts  # 換 token / upsert user / 發 session
+│       │   ├── me.ts               # 回 { id, email, name, tier }
+│       │   └── logout.ts           # 砍 session + 清 cookie
+│       ├── parse-text.ts           # 文字記帳
+│       ├── parse-image.ts          # 圖片記帳
+│       └── expenses.ts             # 我的記帳列表
+├── src/                            # 純 lib（不再是 Worker 入口）
+│   ├── vision.ts                   # Workers AI Vision 解析
+│   ├── text.ts                     # 文字解析
+│   ├── db.ts                       # D1 query（user / session / expense / ai_runs）
+│   ├── auth.ts                     # cookie + session + OAuth helper
+│   └── types.ts                    # Env / User / Session / ParsedExpense
+├── schema.sql                      # D1 v1（users / sessions / expenses / ai_runs）
+├── wrangler.toml                   # Pages 模式 + binding
 ├── package.json
 ├── tsconfig.json
-├── .dev.vars.example    # 本機開發環境變數範本
-├── .gitignore
-├── README.md
-├── PROJECT.md           # 本檔
-├── CLAUDE.md            # AI 員工手冊（從 MM 複製）
-├── TODO.md              # 待辦 + ⬡ MM 同步表
-├── ROUTINE.md           # 例行檢查
-└── CHANGELOG.md         # 里程碑
+├── .dev.vars.example
+├── README.md / CLAUDE.md / TODO.md / ROUTINE.md / CHANGELOG.md
 ```
 
 ---
 
 ## 通訊協定
 
-**LINE webhook payload**：標準 LINE Messaging API、events 陣列、每個 event 含 source.userId + message.type / id
+### Google OAuth flow
 
-**Worker → Workers AI**（vision）：
+```
+GET /api/auth/google-start
+  → 產 state（random、寫 HttpOnly cookie）
+  → 302 redirect 到 https://accounts.google.com/o/oauth2/v2/auth
+     ?client_id=<LL_SSO>&redirect_uri=<callback>&response_type=code
+     &scope=openid email profile&state=<state>
+
+GET /api/auth/google-callback?code=...&state=...
+  → 驗 state cookie
+  → POST https://oauth2.googleapis.com/token 換 access_token + id_token
+  → 解 id_token（JWT）取 sub / email / name
+  → users 表 upsert（entry_source='google'）
+  → sessions 表插一筆（token = crypto.randomUUID() × 2）
+  → set cookie: session=<token>; HttpOnly; SameSite=Lax; Secure（prod）; Max-Age=30d
+  → 302 回 /
+```
+
+### Session cookie 策略
+
+| 模式 | 條件 | Domain | Secure |
+|------|------|--------|--------|
+| 開發 | `wrangler pages dev` | 無 | false |
+| 生產 | `*.pages.dev` | 無（單域名）| true |
+| 未來 | `*.leaflune.org`（收進 II） | `.leaflune.org` | true |
+
+Token = `crypto.randomUUID()` × 2 拼接、30 天 TTL、寫 D1 `sessions` 表。撤銷 = DELETE D1 row。
+
+### AI 呼叫
+
 ```ts
+// Vision
 const res = await env.AI.run('@cf/meta/llama-3.2-11b-vision-instruct', {
   image: [...uint8Array],
-  prompt: '從收據抽出：店家、日期、總額、品項清單。回 JSON。',
+  messages: [{ role: 'user', content: RECEIPT_PROMPT }],
+  temperature: 0,                   // 結構化抽取、不要創意
+  max_tokens: 512,
+});
+
+// Text
+const res = await env.AI.run('@cf/meta/llama-3.1-8b-instruct', {
+  messages: [{ role: 'system', content: TEXT_PROMPT }, { role: 'user', content: userText }],
+  temperature: 0,
 });
 ```
 
-**D1 schema**（簡化）：
-```sql
-CREATE TABLE expenses (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  user_id TEXT,          -- LINE userId
-  amount INTEGER,
-  category TEXT,
-  vendor TEXT,
-  items TEXT,            -- JSON array
-  raw_text TEXT,         -- 原始訊息 / OCR
-  image_key TEXT,        -- R2 object key（可選）
-  ts INTEGER             -- unix timestamp
-);
-```
+每次呼叫前後寫 `ai_runs` 一筆（model / task / latency_ms / neurons / ok）。
 
 ---
 
 ## 已知注意事項
 
-- Workers free tier 單 request CPU 10ms、Vision 推理可能超時（會升 paid tier 50ms）。先測再決定。
-- LINE Push API 每月 200 則免費；reply API 不限、優先用 reply。
-- D1 在 region 邊緣複寫、寫入有 eventually consistent 延遲、記帳場景不影響。
-- Workers AI 視覺模型在中文 OCR 上**準度不保證**、要實測。fallback 路徑：問 user。
+- Pages Functions 同 Workers runtime、CPU 限制 10ms（free）/ 50ms（paid）、Vision 推理可能超時
+- D1 寫入 eventually consistent、但同連線 read-your-writes 有保證
+- Workers AI 視覺模型中文 OCR 準度不保證、fallback：問 user
+- Vision 模型可能下架（5007）、`vision.ts` 應該有 fallback chain
+- Llama 3.2 Vision 對 `prompt` 欄位的服從度低於 `messages`、用 messages 格式
 
 ---
 
 ## 開發規範
 
 - commit 訊息：繁體中文
-- TypeScript strict
-- 單一檔案不超過 500 行
-- 所有外部 API key 走 wrangler secret、不進 git
+- TypeScript strict、`@cloudflare/workers-types` ambient
+- 單一檔案 ≤ 500 行
+- 所有 secrets 走 wrangler secret（Pages dashboard）、不進 git
+- 不寫無謂註解、不過度抽象
 - 期末報告版本拉 `release/class-demo-2026-05` 分支保存
 
 ---
 
 ## 與 LL 宇宙的關係
 
-| 對應 | 角色 |
-|---|---|
-| LL（matrix-manager） | EE 的治理 / 任務歸屬 |
-| II（infinity-identity） | EE 累積的 user 消費 history、未來會餵進 II 的關係資料 |
-| AA（agent-avatar） | EE 的 chatbot 角色定義（暫定：echo 君、口語溫和） |
-| CF 全家桶 | EE 是 LL 第一個 CF 全站試點、之後 yeyan / II 可比照 |
+| 軸 | 對應 | EE 的角色 |
+|---|---|---|
+| **LL**（World、matrix-manager） | 治理 / 任務歸屬 / 會議紀錄 | EE 是 LL 旗下練手專案、不獨立成子品牌 |
+| **II**（User、infinity-identity） | 統一身份 + 會員 context | EE 是 II 的彩蛋功能、終局收進 II dashboard；現階段獨立練手、Google OAuth / session / cookie pattern 之後拷貝給 II |
+| **AA**（Agent、agent-avatar） | agent 人格基因序列 | EE 暫無對話 agent（純表單 UI）；未來若加客服、走 II 的小葉 / 小月、不自養角色 |
+
+**entry_source**：EE 的所有 user 都是 `entry_source='google'`、EE 自己不算一個來源。
+
+---
+
+## 戰略原則
+
+> **EE 是 II 的微縮先行者、不是獨立產品。**
+>
+> 所有設計決策遵循「能讓 II 直接複用就複用」、不為 EE 自身做特化。
+> 期末報告 demo 是順手收割、不是核心目標。

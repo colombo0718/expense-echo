@@ -1,72 +1,121 @@
 # TODO — Expense Echo
 
+> 對應施工計畫：[`docs/web-oauth-pivot.md`](docs/web-oauth-pivot.md)
+
+---
+
 ## ⬡ MM 同步
 
 | title | status | importance | energy | effort | due | next_action | tags |
 |-------|--------|------------|--------|--------|-----|-------------|------|
-| LINE OA channel 設定 + webhook 接通 | active | 1 | l | 60 | 2026-05-22 | 申請 LINE Developer channel、拿 channel secret / token | line,setup |
-| Workers + D1 + R2 + AI 全家桶 hello world | active | 1 | m | 90 | 2026-05-22 | wrangler init、設好 binding、Workers AI 試打一張收據 | cf,setup |
-| Llama 3.2 Vision 收據解析 prompt 調校 | queued | 1 | h | 120 |  | 準備 5 張不同店家收據樣本、寫測試 script | ai,prompt |
-| 文字訊息解析（口語記帳） | queued | 1 | m | 90 |  | prompt template + 結構化抽取 | nlp |
-| 條碼補價（OpenFoodFacts 整合） | idea | 2 | l | 60 |  | 等收據主流程穩 | barcode |
-| 期末報告版本：壓測 + 結果分析 | active | 1 | h | 240 | 2026-06-15 | 跑 config 拆題 stress test、收結果做圖 | report |
-| 期末報告 slide deck | active | 1 | m | 180 | 2026-06-20 | 沿 cell2sentence_slides 風格、Problem-Method-Result 結構 | report |
-| 會員制 echo（歷史關係性回饋） | idea | 3 | h | 480 |  | 等核心穩、有 user data 才有意義 | membership |
+| Pivot Step 1：拔 LINE | active | 1 | l | 30 | | 刪 src/index.ts / src/line.ts、wrangler.toml 改 Pages | pivot |
+| Pivot Step 2：D1 真建 + schema v1 | active | 1 | l | 30 | | wrangler d1 create、execute schema.sql、ID 填回 wrangler.toml | cf,db |
+| Pivot Step 3：GCP OAuth Client 申請 | active | 1 | m | 60 | | colombo 親自申請「LeafLune SSO」、5 條 redirect 一次填齊 | oauth,colombo |
+| Pivot Step 4：OAuth 四檔 | queued | 1 | h | 240 | | google-start / google-callback / me / logout | oauth,backend |
+| Pivot Step 5：前端骨架 | queued | 1 | m | 180 | | login.html + index.html + app.js + styles.css | frontend |
+| Pivot Step 6：文字記帳 E2E | queued | 1 | m | 120 | | functions/api/parse-text.ts + 前端文字框 | ai,text |
+| Pivot Step 7：圖片記帳 E2E | queued | 1 | h | 180 | | functions/api/parse-image.ts + R2 + Vision + 前端上傳 | ai,vision |
+| Pivot Step 8：metrics 接線 | queued | 1 | l | 60 | | 每次 AI 呼叫寫 ai_runs | metrics |
+| Pivot Step 9：CF Pages 部署 | queued | 1 | m | 90 | | Dashboard 連 repo + Bindings + OAuth secrets | deploy |
+| Vision model fallback chain | queued | 2 | m | 60 | | Step 7 後加、避免 5007 下架重演 | reliability |
+| 期末報告壓測 + 結果分析 | queued | 1 | h | 240 | 2026-06-15 | 5 張收據樣本 × 模糊度 × 中英文混雜、跑 ai_runs 統計 | report |
+| 期末報告 slide deck | queued | 1 | m | 180 | 2026-06-20 | cell2sentence_slides 風格、Problem-Method-Result | report |
+| Hands-free 語音模式（Whisper + melotts） | idea | 2 | h | 240 | | 主流程穩了再做、目標：開車情境 | voice |
+| 條碼補價（OpenFoodFacts） | idea | 3 | l | 60 | | 主流程穩了再做 | barcode |
+| 電子發票補價（財政部 API） | idea | 3 | m | 120 | | 要先申請 | invoice |
+| 收進 II dashboard | idea | 2 | h | 360 | | II Phase 5 後評估、cookie 改父網域 | ii,integration |
+| LINE channel | archived | — | — | — | | 永久放棄、web-only 就夠 | line |
 
 ---
 
 ## 詳細
 
-### MVP（兩週內出 demo）
+### Pivot 推進順序（對應 docs/web-oauth-pivot.md §三）
 
-- [ ] **LINE channel 設定**
-  - 申請 LINE Developer Account → 建 Messaging API channel
-  - 拿 `LINE_CHANNEL_SECRET` + `LINE_CHANNEL_ACCESS_TOKEN`
-  - 註冊 webhook URL（指向 *.workers.dev）
+#### Step 1：拔 LINE
 
-- [ ] **Cloudflare 環境**
-  - `wrangler init` 起 Worker 專案
-  - 建 D1 database（`wrangler d1 create expense-echo-db`）
-  - 建 R2 bucket（`wrangler r2 bucket create expense-echo-receipts`）
-  - 確認 Workers AI binding（`[ai]` block）
+- [ ] 刪 `src/line.ts`
+- [ ] 刪 `src/index.ts`（Pages Functions 不用統一入口）
+- [ ] 改 `src/types.ts`：刪 `LineEvent`、刪 `Env.LINE_*`、加 `User` + `Session`
+- [ ] 改 `wrangler.toml`：拿掉 `main = "src/index.ts"`、Pages 模式
 
-- [ ] **Hello world webhook**
-  - 收到 LINE event → log 到 D1 → reply 回 user
-  - 確認 channel secret 簽章驗證
+#### Step 2：D1 真建
 
-- [ ] **Vision 流程**
-  - 收到 image event → fetch image binary from LINE
-  - 暫存 R2（key = `<userId>/<messageId>.jpg`）
-  - 餵 Workers AI Llama 3.2 Vision、prompt 要求 JSON 輸出
-  - parse JSON → 寫 D1 → reply user「記到了：7-11 156 元」
+- [ ] `wrangler d1 create expense-echo-db` → 拿 ID
+- [ ] 把 ID 寫回 `wrangler.toml` `database_id`
+- [ ] `wrangler d1 execute expense-echo-db --file=schema.sql --local` 本機建表驗證
+- [ ] `wrangler d1 execute expense-echo-db --file=schema.sql --remote` 雲端建表
 
-- [ ] **Text 流程**
-  - 收到 text → Workers AI text 模型解析
-  - 抽 `{ 品項, 金額, 分類? }`
-  - 不確定就反問 user
+#### Step 3：GCP OAuth Client 申請（colombo 經手）
 
-### 期末報告 track（六月中）
+- [ ] GCP project：`LeafLune`
+- [ ] OAuth consent screen：App name = LeafLune、scopes = openid + email + profile
+- [ ] OAuth Client ID：`LeafLune SSO`、Web application
+- [ ] Authorized redirect URIs 一次填齊（EE 2 條 + II 3 條）
+- [ ] 拿到 CLIENT_ID + SECRET、丟給公關長寫 wrangler secret
 
-- [ ] **壓測流程**
-  - 設計 config：店家種類 × 收據品質 × 模糊度 × 中英文混雜
-  - 跑 50-100 張、收 vision 模型輸出
-  - 量化：欄位正確率、JSON 格式合法率、推理時間
-  - 跟 baseline（純 OCR + 規則式）比較
+#### Step 4：OAuth 四檔
 
-- [ ] **報告 slide deck**
-  - 沿用 cell2sentence_slides 風格
-  - 13-15 張：Cover / Outline / Problem / Method / Stress Test / Results / Discussion / Conclusion
-  - 強調 AI 元素：vision-language 模型、controlled prompt perturbation
+- [ ] `functions/api/auth/google-start.ts`
+- [ ] `functions/api/auth/google-callback.ts`
+- [ ] `functions/api/auth/me.ts`
+- [ ] `functions/api/auth/logout.ts`
+- [ ] `src/auth.ts`（cookie / session helper）
+- [ ] `src/db.ts` 加 user / session CRUD
 
-### 未來（會員化、整合進 II）
+#### Step 5：前端骨架
 
-- [ ] 歷史關係性回饋（會員價值）
-- [ ] 跨 user 隱私邊界設計
-- [ ] II 整合：把 EE 累積的 user 消費 history 餵進 II 的關係資料
+- [ ] `public/login.html`（單一「用 Google 登入」按鈕）
+- [ ] `public/index.html`（已登入主頁、未登入 redirect login）
+- [ ] `public/app.js`（fetch /api/me、fetch /api/parse-* ）
+- [ ] `public/styles.css`
+
+#### Step 6：文字記帳 E2E
+
+- [ ] `functions/api/parse-text.ts`（從 cookie 取 user、呼叫 src/text.ts、寫 D1）
+- [ ] 改 `src/text.ts`：改用 `messages` 格式、加 `temperature: 0`
+- [ ] 前端文字框 → POST 顯示結果
+
+#### Step 7：圖片記帳 E2E
+
+- [ ] `functions/api/parse-image.ts`（multipart、R2 寫入、Vision 解析、寫 D1）
+- [ ] 改 `src/vision.ts`：改用 `messages` 格式、加 `temperature: 0`、加 fallback chain
+- [ ] 前端拍 / 拖照片 → POST 顯示結果
+
+#### Step 8：metrics
+
+- [ ] `src/db.ts` 加 `logAiRun()`
+- [ ] parse-text / parse-image 每次呼叫前後計時 + 寫 ai_runs
+
+#### Step 9：CF Pages 部署
+
+- [ ] CF Dashboard → Workers & Pages → Create → Connect to Git → 選 expense-echo repo
+- [ ] Settings → Functions → Bindings：D1（DB）/ R2（RECEIPTS）/ AI
+- [ ] Settings → Environment → Secrets：GOOGLE_CLIENT_ID、GOOGLE_CLIENT_SECRET、SESSION_COOKIE_SECRET
+- [ ] git push → 自動部署
+- [ ] 開 `https://expenseecho.pages.dev` → 點登入 → 跑通
+
+---
+
+### 期末報告 track（無 deadline 壓力）
+
+- [ ] 壓測 config：店家 × 收據品質 × 模糊度 × 中英文混雜
+- [ ] 跑 50–100 張、收 ai_runs 統計
+- [ ] 量化：欄位正確率、JSON 格式合法率、推理時間
+- [ ] slide deck：cell2sentence_slides 風格、13–15 張
+
+### 未來（收進 II 時做）
+
+- [ ] cookie domain 改 `.leaflune.org` 父網域
+- [ ] EE D1 user 資料併入 II users 表
+- [ ] EE UI 改成 II dashboard 內的一個 tab / widget
+- [ ] entry_source 邏輯統一走 II
 
 ---
 
 ## 擱置
 
-- **自有網域**：先不買、`*.workers.dev` 夠用、課程結束後若繼續再評估
+- **LINE channel**：永久放棄、web-only 就夠
+- **自有網域**：`*.pages.dev` 夠用、未來收進 II 時直接掛 leaflune 子網域
 - **付費 LLM API**：堅持 Workers AI 跑 Llama、$0 是賣點
+- **PBKDF2 / email-password 註冊**：EE 純 OAuth、留給 II Phase 2 驗

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Expense Echo</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <h1>Expense Echo</h1>
+    <div class="user-area">
+      <span id="user-label">…</span>
+      <button id="logout-btn" type="button">登出</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2>文字記帳</h2>
+      <form id="text-form">
+        <input
+          type="text"
+          id="text-input"
+          placeholder="例如：便當 90、7-11 飲料 30"
+          autocomplete="off"
+          required
+        />
+        <button type="submit">記帳</button>
+      </form>
+    </section>
+
+    <section class="card">
+      <h2>收據拍照</h2>
+      <form id="image-form">
+        <input type="file" id="image-input" accept="image/*" capture="environment" required />
+        <button type="submit">上傳解析</button>
+      </form>
+    </section>
+
+    <section class="card">
+      <h2>結果</h2>
+      <div id="result" class="result-area">尚無紀錄。</div>
+    </section>
+
+    <section class="card">
+      <h2>最近的紀錄</h2>
+      <ul id="recent" class="recent-list">載入中…</ul>
+    </section>
+  </main>
+
+  <script src="/app.js" type="module"></script>
+</body>
+</html>

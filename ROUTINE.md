@@ -6,7 +6,11 @@
 
 ## 每次 deploy 前
 - `npm run typecheck` 過
-- 本機 `wrangler dev` 跑一輪手動測（拍張 7-11 收據試）
+- 本機 `npm run dev`（wrangler pages dev public）跑一輪手動測：
+  - 點「用 Google 登入」→ 完整 OAuth 走通
+  - 文字記帳「便當 90」→ 看到結果 + 出現在最近紀錄
+  - 拍張 7-11 收據 → 看到 vision 解析結果
+  - 登出 → 回 login 頁
 - 確認 secret 沒進 git（`.dev.vars` 在 .gitignore）
 
 ## 每週
@@ -19,5 +23,5 @@
 
 ## 視情況
 - 改 vision prompt → 更新 PROJECT.md 的「通訊協定」段
-- LINE channel 設定變動 → 更新 .dev.vars.example
-- 模型升級（Llama 3.2 → 3.3 之類）→ 寫 CHANGELOG
+- GCP OAuth Client 改 redirect URI → 同步更新所有環境 secret + 本機 .dev.vars.example 註解
+- 模型升級（Llama 3.2 → 3.3 之類）→ 寫 CHANGELOG + 更新 src/vision.ts VISION_MODELS
