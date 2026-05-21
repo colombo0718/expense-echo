@@ -4,7 +4,7 @@
 #
 # 注意：Pages Functions 不需要 main entry、filesystem routing 自動 mount functions/
 
-name = "expenseecho"
+name = "expense-echo"
 compatibility_date = "2026-05-21"
 compatibility_flags = ["nodejs_compat"]
 
@@ -30,7 +30,7 @@ bucket_name = "expense-echo-receipts"
 # 環境變數（公開、可進 git）
 [vars]
 APP_NAME = "Expense Echo"
-APP_URL = "https://expenseecho.pages.dev"
+APP_URL = "https://expense-echo.leaflune.org"
 
 # Secrets 走 Pages dashboard → Settings → Environment Variables → Encrypted：
 #   GOOGLE_CLIENT_ID         # LeafLune SSO OAuth Client（LL 共用）

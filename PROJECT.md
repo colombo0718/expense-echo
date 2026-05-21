@@ -2,7 +2,7 @@
 
 ## 別名 / 搜尋關鍵字
 
-- `expense-echo`（repo 名）/ `expenseecho`（CF Pages 專案名）
+- `expense-echo`（repo 名 + CF Pages 專案名、對齊）
 - `EE`（雙字母代號）
 - `記帳`、`收據`、`vision`、`消費回響`（功能脈絡）
 
@@ -32,7 +32,7 @@
 ## 部署方式
 
 - **平台**：Cloudflare Pages（前端 + Functions）+ D1 + R2 + Workers AI
-- **URL**：`https://expenseecho.pages.dev`（未來收進 II 後改 `ee.leaflune.org` 或直接合進 `id.leaflune.org/dashboard`）
+- **URL**：`https://expense-echo.leaflune.org`（自有子網域、`expense-echo.pages.dev` 為 CF 預設 fallback；未來收進 II 後可改合進 `id.leaflune.org/dashboard`）
 - **CI/CD**：git push → CF Pages 自動部署、不需本機 wrangler
 
 ---
@@ -41,7 +41,7 @@
 
 ```
 未登入用戶
-  │ 開 expenseecho.pages.dev
+  │ 開 expense-echo.leaflune.org
   ▼
 public/login.html — 「用 Google 登入」按鈕
   │ 點 → /api/auth/google-start

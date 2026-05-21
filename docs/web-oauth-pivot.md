@@ -178,7 +178,7 @@ Session token = `crypto.randomUUID()` × 2 拼接、30 天有效、寫 D1 sessio
 
 ## 八、已拍板事項（2026-05-21）
 
-1. **CF Pages 專案名 = `expenseecho`**（無 dash、對齊 leaflune / reinroom / datadojo / cubiccraft 慣例）→ URL = `expenseecho.pages.dev`
+1. **CF Pages 專案名 = `expense-echo`**（有 dash、跟 GitHub repo 名 + D1 / R2 資源名對齊；對齊 `trade-trail` / `workers-ai-chat` 多字描述名慣例）→ 自有子網域 URL = `expense-echo.leaflune.org`、CF 預設 fallback = `expense-echo.pages.dev`
 2. **GCP OAuth Client 走 LL 共用一張**：
    - GCP project 名：`LeafLune`、OAuth Client 名：`LeafLune SSO`
    - Consent screen App name = `LeafLune`、Authorized domains = `leaflune.org` + `pages.dev`
@@ -186,7 +186,8 @@ Session token = `crypto.randomUUID()` × 2 拼接、30 天有效、寫 D1 sessio
    - Authorized redirect URIs（一次填齊、II / 未來 RR / DD 接 SSO 直接複用）：
      ```
      http://localhost:8788/api/auth/google-callback        # EE 開發
-     https://expenseecho.pages.dev/api/auth/google-callback # EE 上線
+     https://expense-echo.pages.dev/api/auth/google-callback # EE CF 預設
+     https://expense-echo.leaflune.org/api/auth/google-callback # EE 自有子網域
      http://localhost:8788/auth/google-callback             # II 開發
      https://id.leaflune.org/auth/google-callback           # II 上線
      https://dev-id.leaflune.org/auth/google-callback       # II tunnel

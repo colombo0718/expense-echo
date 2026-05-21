@@ -93,7 +93,7 @@
 - [ ] Settings → Functions → Bindings：D1（DB）/ R2（RECEIPTS）/ AI
 - [ ] Settings → Environment → Secrets：GOOGLE_CLIENT_ID、GOOGLE_CLIENT_SECRET、SESSION_COOKIE_SECRET
 - [ ] git push → 自動部署
-- [ ] 開 `https://expenseecho.pages.dev` → 點登入 → 跑通
+- [ ] 開 `https://expense-echo.leaflune.org` → 點登入 → 跑通
 
 ---
 
