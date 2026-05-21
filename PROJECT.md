@@ -10,22 +10,24 @@
 
 ## 這是什麼
 
-**LL 第一個全 CF 全家桶 + 會員制練手場**。
+**EE = LL Agent 立體遊走各平台、生動與用戶互動的首發示範。**
 
-對外：web 記帳工具，拍收據 / 講一句話 / 自動入帳，未來收進 II dashboard 當會員小彩蛋。
-對內：CF Pages + Functions + D1 + R2 + Workers AI + Google OAuth 一條龍走通、所有 pattern 之後搬到 II Phase 1。
+不是記帳工具、是「**守財奴依依**在 LL 宇宙裡真實生活、user 觀看 + 參與 + 受益」的展示窗口。
+記帳功能只是依依跟 user 互動的 surface、底下是 RR train → TT 實戰 → EE 結算 → agent-stream 直播的完整 narrative。
 
-**終局定位**：EE 不獨立成子品牌、最終收進 II dashboard 當會員彩蛋功能。獨立 repo 只為練手時隔離爆炸範圍。
+→ **完整戰略憲法見 [`docs/strategy.md`](docs/strategy.md)。**
 
 ---
 
-## 三重價值
+## 三重價值（已升級）
 
 | 對 | 價值 |
 |---|---|
-| **元智生資課期末報告** | Vision-language 模型 OCR + 理解 + 分類 demo + 壓測流程 + controlled prompt perturbation 分析 |
-| **LL 內部 CF 練手** | 第一個全 CF 試點、deploy / binding / OAuth / session 全 pattern 之後可複製 |
-| **LL 會員制先行者** | Google OAuth + D1 session + cookie 雙模式先在 EE 走通、II Phase 1 直接拷貝 |
+| **LL 對外 IP 化** | 第一個有完整四螺旋（情緒 × 功能 × 業務 × 跨平台 narrative）的 agent 落地 |
+| **LL 內部技術基建** | CF 全家桶 + 會員制（OAuth + session）全 pattern 跑通、II Phase 1 直接拷貝 |
+| **LL 商業飛輪先行** | 對話式 PLG + RL retention + B2B 擴張、第一個有收費機制的對外服務 |
+
+期末報告（vision 壓測 + slide）順手收割、不是核心目標。
 
 ---
 
