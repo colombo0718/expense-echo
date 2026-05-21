@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## [0.1.0] - 2026-05-21（規劃中、待施工）
+## [0.1.0] - 2026-05-21（文字路徑 E2E 通、圖片路徑待驗）
 
 ### 破壞性變更
 - **架構從 Cloudflare Workers + LINE webhook 轉為 Cloudflare Pages + Functions + Google OAuth**
@@ -18,16 +18,29 @@
 - Google OAuth 強制登入：未登入 access /api/* 直接 401
 - 目錄結構：`public/` 前端 + `functions/api/` Pages Functions + `src/` 純 lib
 
-### 待施工（依 docs/web-oauth-pivot.md §三 順序）
-1. 拔 LINE 程式碼
-2. D1 真建 + schema v1 上線
-3. GCP OAuth Client 申請（colombo 經手）
-4. OAuth 四檔（google-start / callback / me / logout）
-5. 前端骨架（login.html + index.html + app.js）
-6. 文字記帳 E2E
-7. 圖片記帳 E2E
-8. ai_runs metrics 接線
-9. CF Pages 部署
+### 已完成（依 docs/web-oauth-pivot.md §三 順序）
+1. ✅ 拔 LINE 程式碼（dfd39bf）
+2. ✅ D1 真建 + schema v1 上線（6661ac8、4 表 local + remote）
+3. ✅ GCP OAuth Client 申請（colombo 經手、`LeafLune SSO`、1 條 redirect URI）
+4. ✅ OAuth 四檔（google-start / callback / me / logout、driver 走通）
+5. ✅ 前端骨架（login.html + index.html + app.js + styles.css）
+6. ✅ 文字記帳 E2E（Llama 3.1 8B、餐飲分類、885ms）
+7. ⏳ 圖片記帳 E2E（架構通、實際拍收據未測）
+8. ✅ ai_runs metrics 接線
+9. ✅ CF Pages 部署（`expense-echo.leaflune.org` CNAME → `expense-echo.pages.dev`）
+
+### infra 上線（2026-05-21）
+- CF Pages 專案：`expense-echo`、自有子網域 `expense-echo.leaflune.org`
+- D1：`expense-echo-db`、id `2c3d0e37-c6aa-4007-905f-2075dd1c40ea`
+- R2：`expense-echo-receipts`、Standard class
+- CF Pages production secrets：`GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` / `SESSION_COOKIE_SECRET`（皆 Encrypted）
+- GCP OAuth Client：`LeafLune SSO`（共用、之後 II / RR / DD 都接這張）
+
+### 待補
+- ⏳ 圖片記帳 E2E 實測（拍 7-11 收據）
+- ⏳ 補 GCP redirect URI 剩 5 條（localhost / pages.dev / II 預留 3 條）
+- ⏳ CF Pages Preview 環境 secrets 重設（feature branch 開預覽時用）
+- ⏳ Vision 模型 fallback chain 實戰驗證（5007 下架時自動切第二個）
 
 ---
 
