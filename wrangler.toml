@@ -19,7 +19,7 @@ binding = "AI"
 [[d1_databases]]
 binding = "DB"
 database_name = "expense-echo-db"
-database_id = "REPLACE_WITH_REAL_ID_AFTER_wrangler_d1_create"
+database_id = "2c3d0e37-c6aa-4007-905f-2075dd1c40ea"
 
 # R2 object storage（收據圖片暫存）
 # 建：wrangler r2 bucket create expense-echo-receipts
