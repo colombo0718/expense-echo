@@ -1,5 +1,13 @@
 import type { Env, ChatMessage, ParsedExpense } from './types';
 
+export interface ExpenseHistoryItem {
+  amount: number;
+  vendor: string | null;
+  category: string | null;
+  items: string | null;
+  ts: number;
+}
+
 const YIYI_MODEL = '@cf/meta/llama-3.1-8b-instruct';
 
 const YIYI_SYSTEM_PROMPT = `你是「守財奴依依」、LeafLune 宇宙的金流總管、暫時是 {user_name} 的個人理財夥伴。
@@ -25,7 +33,12 @@ const YIYI_SYSTEM_PROMPT = `你是「守財奴依依」、LeafLune 宇宙的金�
 - 用戶上傳收據 → 解析回報、若有歧義反問
 - 解析失敗或無金額 → 溫柔提示用戶換種說法、不要冷冰冰報錯
 - 不要列項目符號、用對話自然口吻
-- 回應 < 60 字、簡潔`;
+- 回應 < 60 字、簡潔
+
+數字使用紀律（重要、不可違反）：
+- 提到金額、只能引用「當前狀態」段給你的數字 / 或「最近消費」列表裡的數字
+- 不要憑空計算、不要說「剩下 X 元」「還有預算 Y 元」這種你沒被告知的概念
+- 不確定的金額一律省略不講、不要編`;
 
 export interface YiyiReplyContext {
   user_name: string;
@@ -33,6 +46,7 @@ export interface YiyiReplyContext {
   today_total: number;
   month_total: number;
   recent_chats: ChatMessage[];
+  recent_expenses: ExpenseHistoryItem[];
   parsed_result: ParsedExpense | null;
   user_text?: string;
   user_image?: boolean;
@@ -46,11 +60,28 @@ export interface YiyiReplyResult {
   error?: string;
 }
 
+function fmtExpense(e: ExpenseHistoryItem): string {
+  const d = new Date(e.ts * 1000);
+  const month = d.getUTCMonth() + 1;
+  const day = d.getUTCDate();
+  const label = e.vendor || e.category || '消費';
+  return `${month}/${day} ${label} ${e.amount} 元`;
+}
+
 function buildContextLine(ctx: YiyiReplyContext): string {
   const lines: string[] = [];
   lines.push(`用戶等級：${ctx.user_tier}`);
   lines.push(`今日累積消費：${ctx.today_total} 元`);
   lines.push(`本月累積消費：${ctx.month_total} 元`);
+
+  if (ctx.recent_expenses.length) {
+    lines.push('最近消費紀錄（新到舊）：');
+    for (const e of ctx.recent_expenses) {
+      lines.push(`  ・${fmtExpense(e)}`);
+    }
+  } else {
+    lines.push('最近消費紀錄：（公子目前還沒記過任何帳）');
+  }
 
   if (ctx.user_image) {
     if (ctx.parsed_result) {

@@ -7,6 +7,7 @@ import {
   logAiRun,
   insertChat,
   listRecentChats,
+  listRecentExpenses,
   getTodayTotal,
   getMonthTotal,
 } from '../../src/db';
@@ -92,6 +93,11 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     });
   }
 
+  // 雙保險：parser 已過濾 amount<=0、這邊再擋一次
+  if (parsed && (typeof parsed.amount !== 'number' || parsed.amount <= 0)) {
+    parsed = null;
+  }
+
   if (parsed) {
     expenseId = await saveExpense(env.DB, {
       user_id: user.id,
@@ -123,6 +129,14 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   const todayTotal = await getTodayTotal(env.DB, user.id);
   const monthTotal = await getMonthTotal(env.DB, user.id);
   const recentChats = await listRecentChats(env.DB, user.id, 16);
+  const recentExpensesRaw = await listRecentExpenses(env.DB, user.id, 8);
+  const recentExpenses = (recentExpensesRaw as any[]).map((r) => ({
+    amount: r.amount,
+    vendor: r.vendor ?? null,
+    category: r.category ?? null,
+    items: r.items ?? null,
+    ts: r.ts,
+  }));
 
   const yiyi = await generateYiyiReply(
     {
@@ -131,6 +145,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
       today_total: todayTotal,
       month_total: monthTotal,
       recent_chats: recentChats as any,
+      recent_expenses: recentExpenses,
       parsed_result: parsed,
       user_text: userText,
       user_image: !!userImage,

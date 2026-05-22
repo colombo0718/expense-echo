@@ -52,8 +52,8 @@ export async function parseReceiptImage(imageBytes: Uint8Array, env: Env): Promi
       if (parsed.error) {
         return { parsed: null, model, ok: false, error: parsed.error };
       }
-      if (typeof parsed.amount !== 'number') {
-        lastError = 'no numeric amount';
+      if (typeof parsed.amount !== 'number' || parsed.amount <= 0) {
+        lastError = 'no positive amount';
         continue;
       }
 
