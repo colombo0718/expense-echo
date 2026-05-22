@@ -1,0 +1,40 @@
+# CF Pages cache 規則
+# 開發階段：HTML / CSS / JS 強制 revalidate（避免手機端 cache 鎖死）
+# 圖片資源：可以 cache 一天（節省流量）
+#
+# max-age=0 + must-revalidate：
+#   browser 可以快取、但每次使用前都要 hit server 確認 ETag
+#   沒變 → 304 Not Modified（不重 download、超快）
+#   變了 → 拿新版
+#   解掉「手機改 CSS 看不到」的痛點
+
+/index.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+/login.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+/app.js
+  Cache-Control: public, max-age=0, must-revalidate
+
+/styles.css
+  Cache-Control: public, max-age=0, must-revalidate
+
+# 圖片 / 字型可以 cache 一天
+/*.png
+  Cache-Control: public, max-age=86400
+
+/*.jpg
+  Cache-Control: public, max-age=86400
+
+/*.jpeg
+  Cache-Control: public, max-age=86400
+
+/*.svg
+  Cache-Control: public, max-age=86400
+
+/*.webp
+  Cache-Control: public, max-age=86400
+
+/*.ico
+  Cache-Control: public, max-age=86400
