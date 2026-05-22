@@ -142,39 +142,27 @@ async function syncNewChats() {
   }
 }
 
-// 輪詢間隔（tab 可見時、每 N 毫秒拉新訊息）
-const SYNC_POLL_MS = 8000;
-let pollTimer = null;
+// ── 輪詢同步機制（暫時註解、省資源、要重啟拿掉註解即可）─────────────────
+// const SYNC_POLL_MS = 8000;
+// let pollTimer = null;
+// function startPolling() {
+//   if (pollTimer) return;
+//   pollTimer = setInterval(() => {
+//     if (document.visibilityState === 'visible' && lastMsgId > 0) {
+//       syncNewChats();
+//     }
+//   }, SYNC_POLL_MS);
+// }
+// function stopPolling() {
+//   if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+// }
+// ──────────────────────────────────────────────────────────────
 
-function startPolling() {
-  if (pollTimer) return;
-  pollTimer = setInterval(() => {
-    if (document.visibilityState === 'visible' && lastMsgId > 0) {
-      syncNewChats();
-    }
-  }, SYNC_POLL_MS);
-}
-
-function stopPolling() {
-  if (pollTimer) {
-    clearInterval(pollTimer);
-    pollTimer = null;
-  }
-}
-
+// 同步觸發點：切回前景 / window 取得焦點
 document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible') {
-    syncNewChats();   // 切回來立刻補同步
-    startPolling();   // 重啟輪詢
-  } else {
-    stopPolling();    // 隱藏就停、不浪費
-  }
+  if (document.visibilityState === 'visible') syncNewChats();
 });
-
 window.addEventListener('focus', syncNewChats);
-window.addEventListener('blur', () => {
-  // 視窗失焦不停 polling（visibility 才停）、focus 是切視窗 / app、visibility 是切 tab
-});
 
 async function sendText(text) {
   const pending = appendPending('yiyi', '依依正在看⋯⋯');
@@ -502,5 +490,5 @@ logoutBtn.addEventListener('click', async () => {
   if (!user) return;
   userLabel.textContent = `${user.name ?? user.email} · ${user.tier}`;
   await loadChats();
-  startPolling();   // 初始載入完啟動輪詢
+  // startPolling();   // ← 要重啟輪詢時拿掉註解（搭配上方那段也要拿）
 })();
