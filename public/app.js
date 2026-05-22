@@ -142,26 +142,36 @@ async function syncNewChats() {
   }
 }
 
-// ── 輪詢同步機制（暫時註解、省資源、要重啟拿掉註解即可）─────────────────
-// const SYNC_POLL_MS = 8000;
-// let pollTimer = null;
-// function startPolling() {
-//   if (pollTimer) return;
-//   pollTimer = setInterval(() => {
-//     if (document.visibilityState === 'visible' && lastMsgId > 0) {
-//       syncNewChats();
-//     }
-//   }, SYNC_POLL_MS);
-// }
-// function stopPolling() {
-//   if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
-// }
-// ──────────────────────────────────────────────────────────────
+// 輪詢同步：tab 可見時每 8 秒拉一次新訊息、隱藏自動暫停
+// 早期 user 量小、優先體感、口碑起來再省
+const SYNC_POLL_MS = 8000;
+let pollTimer = null;
 
-// 同步觸發點：切回前景 / window 取得焦點
+function startPolling() {
+  if (pollTimer) return;
+  pollTimer = setInterval(() => {
+    if (document.visibilityState === 'visible' && lastMsgId > 0) {
+      syncNewChats();
+    }
+  }, SYNC_POLL_MS);
+}
+
+function stopPolling() {
+  if (pollTimer) {
+    clearInterval(pollTimer);
+    pollTimer = null;
+  }
+}
+
 document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible') syncNewChats();
+  if (document.visibilityState === 'visible') {
+    syncNewChats();   // 切回來立刻補同步
+    startPolling();   // 重啟輪詢
+  } else {
+    stopPolling();    // 隱藏就停
+  }
 });
+
 window.addEventListener('focus', syncNewChats);
 
 async function sendText(text) {
@@ -490,5 +500,5 @@ logoutBtn.addEventListener('click', async () => {
   if (!user) return;
   userLabel.textContent = `${user.name ?? user.email} · ${user.tier}`;
   await loadChats();
-  // startPolling();   // ← 要重啟輪詢時拿掉註解（搭配上方那段也要拿）
+  startPolling();
 })();
