@@ -6,3 +6,9 @@ node_modules/
 dist/
 .env
 .env.local
+
+# 本機開發暫存（撈 R2 圖、testing artifacts 等）
+.tmp-*
+*.tmp.jpg
+*.tmp.png
+*.tmp.webm
