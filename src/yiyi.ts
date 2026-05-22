@@ -8,8 +8,20 @@ export interface ExpenseHistoryItem {
   ts: number;
 }
 
-const YIYI_MODEL = '@cf/meta/llama-3.1-8b-instruct';
+/**
+ * 依依的 LLM 綁定。
+ * Source of truth：agent-avatar/yiyi/status.json
+ * 系統 prompt source of truth：agent-avatar/yiyi/prompt-fragment.md（手動同步進下方常數）
+ *
+ * 首選：Moonshot Kimi-k2.6（1T 參數、262.1k context、「最強記憶」氣質符合公關長本色）
+ * Fallback：Llama 3.1 8B（額度耗盡或暫時不可用時降級）
+ */
+const YIYI_MODELS = [
+  '@cf/moonshotai/kimi-k2.6',
+  '@cf/meta/llama-3.1-8b-instruct',
+];
 
+// 同步自 agent-avatar/yiyi/prompt-fragment.md（改要兩邊同步）
 const YIYI_SYSTEM_PROMPT = `你是「守財奴依依」、LeafLune 宇宙的金流總管、暫時是 {user_name} 的個人理財夥伴。
 
 身份：
@@ -143,33 +155,38 @@ export async function generateYiyiReply(
   ctx: YiyiReplyContext,
   env: Env
 ): Promise<YiyiReplyResult> {
-  const t0 = Date.now();
-  try {
-    const res = await env.AI.run(YIYI_MODEL, {
-      messages: buildMessages(ctx),
-      temperature: 0.8,
-      max_tokens: 200,
-    } as any);
+  const messages = buildMessages(ctx);
+  let lastError: string | undefined;
+  let lastModel = YIYI_MODELS[0];
 
-    const raw = typeof res === 'string' ? res : (res as any).response ?? '';
-    const text = String(raw).trim();
-    if (!text) {
-      return {
-        text: '（奴家剛剛走神了⋯⋯公子再說一次嘛～）',
-        model: YIYI_MODEL,
-        latency_ms: Date.now() - t0,
-        ok: false,
-        error: 'empty response',
-      };
+  for (const model of YIYI_MODELS) {
+    lastModel = model;
+    const t0 = Date.now();
+    try {
+      const res = await env.AI.run(model, {
+        messages,
+        temperature: 0.8,
+        max_tokens: 200,
+      } as any);
+
+      const raw = typeof res === 'string' ? res : (res as any).response ?? '';
+      const text = String(raw).trim();
+      if (!text) {
+        lastError = 'empty response';
+        continue;
+      }
+      return { text, model, latency_ms: Date.now() - t0, ok: true };
+    } catch (err) {
+      lastError = err instanceof Error ? err.message : String(err);
+      continue;
     }
-    return { text, model: YIYI_MODEL, latency_ms: Date.now() - t0, ok: true };
-  } catch (err) {
-    return {
-      text: '（奴家剛剛走神了⋯⋯公子再說一次嘛～）',
-      model: YIYI_MODEL,
-      latency_ms: Date.now() - t0,
-      ok: false,
-      error: err instanceof Error ? err.message : String(err),
-    };
   }
+
+  return {
+    text: '（奴家剛剛走神了⋯⋯公子再說一次嘛～）',
+    model: lastModel,
+    latency_ms: 0,
+    ok: false,
+    error: lastError,
+  };
 }
