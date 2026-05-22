@@ -322,6 +322,51 @@ CC 內購 → 走依依
 
 ---
 
+## 十點五、雙層 LLM 架構（職責劃分）
+
+EE / 任何 LL AI 應用、強制分三層、各司其職：
+
+```
+┌─────────────────────────────────────────────┐
+│ 數據層（src/data-layer.ts）  把事情做對       │
+│   ├ LLM parse（呼叫 text.ts / vision.ts）   │
+│   ├ 讀 / 寫資料庫（chats / expenses / ...）  │
+│   ├ 算狀態（today/month total、recent ...）  │
+│   └ 確保資料正確性（嚴格 validate、雙保險）   │
+└─────────────────────────────────────────────┘
+              ↓ 完整 WorldState
+┌─────────────────────────────────────────────┐
+│ 人格層（src/yiyi.ts）  把話講得有人味         │
+│   ├ Input：數據層算好的 state               │
+│   ├ LLM 包裝成自然語言                       │
+│   └ Output：純 text、不碰 DB                 │
+└─────────────────────────────────────────────┘
+              ↓ reply text
+┌─────────────────────────────────────────────┐
+│ orchestrator（functions/api/chat.ts）  最薄  │
+│   ├ auth                                    │
+│   ├ 解析 request                             │
+│   ├ 跑數據層                                 │
+│   ├ 跑人格層                                 │
+│   ├ 把 reply 交回數據層持久化                 │
+│   └ return JSON                              │
+└─────────────────────────────────────────────┘
+```
+
+**評估指標分層**：
+
+| 層 | 用什麼指標 | 用途 |
+|---|---|---|
+| 數據層 | accuracy / format compliance / latency / neurons | 學術 demo、期末壓測 |
+| 人格層 | UX / 滿意度 / retention / A/B 測試 | 產品 demo、用戶體驗 |
+| orchestrator | 只要不出 bug、不評估 | — |
+
+**期末實驗 track 的 focus 點**：**只攻數據層**、人格層保持 default、避免「**情緒價值**」這套字眼出現在學術報告。
+
+→ memory：[[project-ll-two-layer-llm-data-persona]]
+
+---
+
 ## 十一、戰略原則
 
 | 原則 | 內容 |
