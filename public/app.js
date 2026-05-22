@@ -2,9 +2,9 @@ const userLabel = document.getElementById('user-label');
 const logoutBtn = document.getElementById('logout-btn');
 const thread = document.getElementById('chat-thread');
 const textInput = document.getElementById('text-input');
-const imageInput = document.getElementById('image-input');
-const sendBtn = document.getElementById('send-btn');
-const micBtn = document.getElementById('mic-btn');
+const cameraInput = document.getElementById('camera-input');
+const galleryInput = document.getElementById('gallery-input');
+const actionBtn = document.getElementById('action-btn');
 
 const fmtTs = (ts) =>
   new Date(ts * 1000).toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', hour12: false });
@@ -199,14 +199,22 @@ async function sendImage(file) {
   }
 }
 
-textInput.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();
-    sendBtn.click();
+// === 輸入欄 dual-mode（空文字 = 🎤 / 有文字 = ➤）===
+function refreshActionBtn() {
+  if (actionBtn.classList.contains('recording') || actionBtn.classList.contains('busy')) return;
+  const hasText = textInput.value.trim().length > 0;
+  if (hasText) {
+    actionBtn.classList.add('send-mode');
+    actionBtn.textContent = '➤';
+    actionBtn.title = '傳送';
+  } else {
+    actionBtn.classList.remove('send-mode');
+    actionBtn.textContent = '🎤';
+    actionBtn.title = '錄音';
   }
-});
+}
 
-sendBtn.addEventListener('click', async () => {
+async function sendCurrentText() {
   const text = textInput.value.trim();
   if (!text) return;
   appendMessage({
@@ -218,27 +226,40 @@ sendBtn.addEventListener('click', async () => {
   });
   textInput.value = '';
   textInput.style.height = 'auto';
+  refreshActionBtn();
   await sendText(text);
-});
-
-imageInput.addEventListener('change', async () => {
-  const file = imageInput.files?.[0];
-  if (!file) return;
-  appendMessage({
-    id: `local-${Date.now()}`,
-    role: 'user',
-    msg_type: 'image',
-    content: file.name,
-    ts: Math.floor(Date.now() / 1000),
-  });
-  imageInput.value = '';
-  await sendImage(file);
-});
+}
 
 textInput.addEventListener('input', () => {
   textInput.style.height = 'auto';
   textInput.style.height = Math.min(textInput.scrollHeight, 160) + 'px';
+  refreshActionBtn();
 });
+
+textInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    if (textInput.value.trim()) sendCurrentText();
+  }
+});
+
+function attachImageInput(input) {
+  input.addEventListener('change', async () => {
+    const file = input.files?.[0];
+    if (!file) return;
+    appendMessage({
+      id: `local-${Date.now()}`,
+      role: 'user',
+      msg_type: 'image',
+      content: file.name,
+      ts: Math.floor(Date.now() / 1000),
+    });
+    input.value = '';
+    await sendImage(file);
+  });
+}
+attachImageInput(cameraInput);
+attachImageInput(galleryInput);
 
 // === 語音輸入（Whisper STT）===
 let mediaRecorder = null;
@@ -283,9 +304,10 @@ async function startRecording() {
   });
   mediaRecorder.addEventListener('stop', handleRecordingStop);
   mediaRecorder.start();
-  micBtn.classList.add('recording');
-  micBtn.textContent = '⏹';
-  micBtn.title = '再按一下停止';
+  actionBtn.classList.remove('send-mode');
+  actionBtn.classList.add('recording');
+  actionBtn.textContent = '⏹';
+  actionBtn.title = '再按一下停止';
 }
 
 function stopRecording() {
@@ -296,10 +318,10 @@ function stopRecording() {
     recordingStream.getTracks().forEach((t) => t.stop());
     recordingStream = null;
   }
-  micBtn.classList.remove('recording');
-  micBtn.classList.add('busy');
-  micBtn.textContent = '⋯';
-  micBtn.title = '處理中';
+  actionBtn.classList.remove('recording');
+  actionBtn.classList.add('busy');
+  actionBtn.textContent = '⋯';
+  actionBtn.title = '處理中';
 }
 
 async function handleRecordingStop() {
@@ -342,18 +364,22 @@ async function handleRecordingStop() {
 }
 
 function resetMicBtn() {
-  micBtn.classList.remove('recording', 'busy');
-  micBtn.textContent = '🎤';
-  micBtn.title = '按一下開始錄音、再按一下停止';
+  actionBtn.classList.remove('recording', 'busy');
+  refreshActionBtn();
 }
 
-micBtn.addEventListener('click', () => {
-  if (micBtn.classList.contains('busy')) return;
-  if (micBtn.classList.contains('recording')) {
+actionBtn.addEventListener('click', () => {
+  if (actionBtn.classList.contains('busy')) return;
+  if (actionBtn.classList.contains('recording')) {
     stopRecording();
-  } else {
-    startRecording();
+    return;
   }
+  // 有文字 → 傳送、沒文字 → 錄音
+  if (textInput.value.trim()) {
+    sendCurrentText();
+    return;
+  }
+  startRecording();
 });
 
 logoutBtn.addEventListener('click', async () => {

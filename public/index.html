@@ -27,16 +27,21 @@
   </main>
 
   <footer class="chat-input-bar">
-    <label for="image-input" class="icon-btn" title="拍 / 選收據">📷</label>
-    <input type="file" id="image-input" accept="image/*" capture="environment" hidden />
-    <button id="mic-btn" type="button" class="icon-btn" title="按住說話、放開送出">🎤</button>
+    <label for="camera-input" class="icon-btn" title="拍照" aria-label="拍照">📷</label>
+    <input type="file" id="camera-input" accept="image/*" capture="environment" hidden />
+
+    <label for="gallery-input" class="icon-btn" title="從相簿選圖" aria-label="從相簿選圖">🖼️</label>
+    <input type="file" id="gallery-input" accept="image/*" hidden />
+
     <textarea
       id="text-input"
       placeholder="跟依依說最近買了什麼?"
       rows="1"
+      enterkeyhint="send"
       autocomplete="off"
     ></textarea>
-    <button id="send-btn" type="button" class="send-btn">傳送</button>
+
+    <button id="action-btn" type="button" class="icon-btn icon-btn--accent" title="錄音 / 傳送" aria-label="錄音或傳送">🎤</button>
   </footer>
 
   <script src="/app.js" type="module"></script>
