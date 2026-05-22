@@ -4,6 +4,7 @@ const thread = document.getElementById('chat-thread');
 const textInput = document.getElementById('text-input');
 const imageInput = document.getElementById('image-input');
 const sendBtn = document.getElementById('send-btn');
+const micBtn = document.getElementById('mic-btn');
 
 const fmtTs = (ts) =>
   new Date(ts * 1000).toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', hour12: false });
@@ -237,6 +238,122 @@ imageInput.addEventListener('change', async () => {
 textInput.addEventListener('input', () => {
   textInput.style.height = 'auto';
   textInput.style.height = Math.min(textInput.scrollHeight, 160) + 'px';
+});
+
+// === 語音輸入（Whisper STT）===
+let mediaRecorder = null;
+let recordedChunks = [];
+let recordingStream = null;
+
+function pickAudioMime() {
+  if (typeof MediaRecorder === 'undefined') return null;
+  const candidates = [
+    'audio/webm;codecs=opus',
+    'audio/webm',
+    'audio/mp4',
+    'audio/ogg;codecs=opus',
+  ];
+  for (const t of candidates) {
+    if (MediaRecorder.isTypeSupported(t)) return t;
+  }
+  return '';
+}
+
+async function startRecording() {
+  if (!navigator.mediaDevices?.getUserMedia) {
+    alert('這個瀏覽器不支援錄音、用打字或拍照吧～');
+    return;
+  }
+  try {
+    recordingStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  } catch (err) {
+    alert('沒拿到麥克風權限、檢查瀏覽器設定～');
+    return;
+  }
+  const mime = pickAudioMime();
+  const options = mime ? { mimeType: mime } : undefined;
+  try {
+    mediaRecorder = new MediaRecorder(recordingStream, options);
+  } catch {
+    mediaRecorder = new MediaRecorder(recordingStream);
+  }
+  recordedChunks = [];
+  mediaRecorder.addEventListener('dataavailable', (e) => {
+    if (e.data && e.data.size > 0) recordedChunks.push(e.data);
+  });
+  mediaRecorder.addEventListener('stop', handleRecordingStop);
+  mediaRecorder.start();
+  micBtn.classList.add('recording');
+  micBtn.textContent = '⏹';
+  micBtn.title = '再按一下停止';
+}
+
+function stopRecording() {
+  if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+    mediaRecorder.stop();
+  }
+  if (recordingStream) {
+    recordingStream.getTracks().forEach((t) => t.stop());
+    recordingStream = null;
+  }
+  micBtn.classList.remove('recording');
+  micBtn.classList.add('busy');
+  micBtn.textContent = '⋯';
+  micBtn.title = '處理中';
+}
+
+async function handleRecordingStop() {
+  const mime = mediaRecorder?.mimeType || 'audio/webm';
+  const blob = new Blob(recordedChunks, { type: mime });
+  recordedChunks = [];
+  if (blob.size === 0) {
+    resetMicBtn();
+    return;
+  }
+  try {
+    const ext = mime.includes('mp4') ? 'm4a' : mime.includes('ogg') ? 'ogg' : 'webm';
+    const fd = new FormData();
+    fd.append('audio', blob, `recording.${ext}`);
+    const res = await fetch('/api/transcribe', {
+      method: 'POST',
+      credentials: 'same-origin',
+      body: fd,
+    });
+    const data = await res.json();
+    if (!res.ok || !data.text) {
+      appendMessage({
+        id: `err-stt-${Date.now()}`,
+        role: 'system',
+        msg_type: 'text',
+        content: data.hint || '（語音轉文字失敗、再試一次）',
+        ts: Math.floor(Date.now() / 1000),
+      });
+      return;
+    }
+    // 塞進輸入框、user 自己決定要不要再修 / 送
+    textInput.value = (textInput.value ? textInput.value + ' ' : '') + data.text;
+    textInput.dispatchEvent(new Event('input'));
+    textInput.focus();
+  } catch (err) {
+    console.error(err);
+  } finally {
+    resetMicBtn();
+  }
+}
+
+function resetMicBtn() {
+  micBtn.classList.remove('recording', 'busy');
+  micBtn.textContent = '🎤';
+  micBtn.title = '按一下開始錄音、再按一下停止';
+}
+
+micBtn.addEventListener('click', () => {
+  if (micBtn.classList.contains('busy')) return;
+  if (micBtn.classList.contains('recording')) {
+    stopRecording();
+  } else {
+    startRecording();
+  }
 });
 
 logoutBtn.addEventListener('click', async () => {

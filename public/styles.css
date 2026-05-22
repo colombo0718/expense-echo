@@ -243,34 +243,59 @@ button:hover { background: var(--bg); }
 .chat-input-bar {
   display: flex;
   align-items: flex-end;
-  gap: 8px;
+  gap: 6px;
   padding: 10px 12px;
   background: var(--card);
   border-top: 1px solid var(--border);
 }
 
-.image-btn {
-  font-size: 22px;
+/* 統一所有 icon 按鈕（📷 🎤）跟輸入框 + 傳送按鈕高度 */
+.icon-btn {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  font-size: 20px;
   cursor: pointer;
-  padding: 6px 10px;
-  border-radius: 8px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
   background: var(--bg);
   user-select: none;
   flex-shrink: 0;
+  padding: 0;
+  line-height: 1;
 }
 
-.image-btn:hover { background: var(--accent-soft); }
+.icon-btn:hover { background: var(--accent-soft); }
+
+.icon-btn.recording {
+  background: #ef4444;
+  border-color: #ef4444;
+  color: #fff;
+  animation: pulse 1s ease-in-out infinite;
+}
+
+.icon-btn.busy {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+}
 
 #text-input {
   flex: 1;
   resize: none;
-  padding: 8px 12px;
+  padding: 9px 14px;
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 10px;
   background: var(--bg);
   color: var(--fg);
   font: inherit;
   line-height: 1.4;
+  min-height: 40px;
   max-height: 160px;
   overflow-y: auto;
 }
@@ -281,9 +306,11 @@ button:hover { background: var(--bg); }
   background: var(--accent);
   color: #fff;
   border-color: var(--accent);
-  padding: 8px 16px;
+  height: 40px;
+  padding: 0 18px;
   border-radius: 10px;
   flex-shrink: 0;
+  font-weight: 500;
 }
 
 .send-btn:hover { filter: brightness(1.1); }
