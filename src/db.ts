@@ -149,6 +149,21 @@ export async function listRecentChats(db: D1Database, userId: string, limit = 50
   return (results as any[]).reverse();
 }
 
+/** 跨裝置增量同步用：拿比 sinceId 新的訊息、ASC 排序 */
+export async function listChatsSince(db: D1Database, userId: string, sinceId: number, limit = 200) {
+  const { results } = await db
+    .prepare(
+      `SELECT id, role, msg_type, content, payload, expense_id, ts
+         FROM chats
+        WHERE user_id = ? AND id > ?
+        ORDER BY id
+        LIMIT ?`
+    )
+    .bind(userId, sinceId, limit)
+    .all();
+  return results as any[];
+}
+
 export async function getTodayTotal(db: D1Database, userId: string): Promise<number> {
   const row = await db
     .prepare(

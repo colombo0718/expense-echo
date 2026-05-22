@@ -6,6 +6,10 @@ const cameraInput = document.getElementById('camera-input');
 const galleryInput = document.getElementById('gallery-input');
 const actionBtn = document.getElementById('action-btn');
 
+// 跨裝置增量同步：記錄目前看到的最大 chat id、切回 tab 時拉新訊息 append
+let lastMsgId = 0;
+const seenIds = new Set();
+
 const fmtTs = (ts) =>
   new Date(ts * 1000).toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', hour12: false });
 
@@ -62,6 +66,12 @@ function renderMessage(msg) {
 }
 
 function appendMessage(msg) {
+  // 真實 DB id（number）才 dedup、local-/r-/err- 開頭的不算
+  if (typeof msg.id === 'number') {
+    if (seenIds.has(msg.id)) return;
+    seenIds.add(msg.id);
+    if (msg.id > lastMsgId) lastMsgId = msg.id;
+  }
   thread.appendChild(renderMessage(msg));
   thread.scrollTop = thread.scrollHeight;
 }
@@ -91,6 +101,8 @@ async function ensureLogin() {
 
 async function loadChats() {
   thread.innerHTML = '';
+  seenIds.clear();
+  lastMsgId = 0;
   const res = await fetch('/api/chats?limit=80', { credentials: 'same-origin' });
   if (!res.ok) {
     thread.appendChild(el('div', 'loading', '對話載入失敗、再整理一次頁面試試'));
@@ -109,6 +121,31 @@ async function loadChats() {
   }
   for (const c of data.chats) appendMessage(c);
 }
+
+// 切回 tab / window focus 時觸發、拉 lastMsgId 之後的新訊息 append
+let syncInFlight = false;
+async function syncNewChats() {
+  if (syncInFlight) return;
+  if (lastMsgId === 0) return; // 還沒初始 load 完
+  syncInFlight = true;
+  try {
+    const res = await fetch(`/api/chats?since_id=${lastMsgId}&limit=200`, {
+      credentials: 'same-origin',
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    for (const c of data.chats ?? []) appendMessage(c);
+  } catch (err) {
+    console.warn('[sync] failed:', err);
+  } finally {
+    syncInFlight = false;
+  }
+}
+
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') syncNewChats();
+});
+window.addEventListener('focus', syncNewChats);
 
 async function sendText(text) {
   const pending = appendPending('yiyi', '依依正在看⋯⋯');
