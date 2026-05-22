@@ -351,39 +351,60 @@ async function handleRecordingStop() {
   const mime = mediaRecorder?.mimeType || 'audio/webm';
   const blob = new Blob(recordedChunks, { type: mime });
   recordedChunks = [];
+  console.log('[mic] recording stopped, blob size:', blob.size, 'mime:', mime);
+
   if (blob.size === 0) {
+    alert('沒錄到聲音、blob 是空的、再試一次');
     resetMicBtn();
     return;
   }
+
+  let res;
   try {
     const ext = mime.includes('mp4') ? 'm4a' : mime.includes('ogg') ? 'ogg' : 'webm';
     const fd = new FormData();
     fd.append('audio', blob, `recording.${ext}`);
-    const res = await fetch('/api/transcribe', {
+    console.log('[mic] uploading', blob.size, 'bytes to /api/transcribe');
+    res = await fetch('/api/transcribe', {
       method: 'POST',
       credentials: 'same-origin',
       body: fd,
     });
-    const data = await res.json();
-    if (!res.ok || !data.text) {
-      appendMessage({
-        id: `err-stt-${Date.now()}`,
-        role: 'system',
-        msg_type: 'text',
-        content: data.hint || '（語音轉文字失敗、再試一次）',
-        ts: Math.floor(Date.now() / 1000),
-      });
-      return;
-    }
-    // 塞進輸入框、user 自己決定要不要再修 / 送
-    textInput.value = (textInput.value ? textInput.value + ' ' : '') + data.text;
-    textInput.dispatchEvent(new Event('input'));
-    textInput.focus();
+    console.log('[mic] /api/transcribe responded:', res.status);
   } catch (err) {
-    console.error(err);
-  } finally {
+    console.error('[mic] fetch error:', err);
+    alert('呼叫 /api/transcribe 失敗：' + (err?.message || err));
     resetMicBtn();
+    return;
   }
+
+  let data;
+  try {
+    data = await res.json();
+  } catch (err) {
+    alert('/api/transcribe 回應不是 JSON、status=' + res.status);
+    resetMicBtn();
+    return;
+  }
+  console.log('[mic] transcribe response:', data);
+
+  if (!res.ok) {
+    alert('轉文字失敗（status ' + res.status + '）：\n' + JSON.stringify(data, null, 2));
+    resetMicBtn();
+    return;
+  }
+
+  if (!data.text) {
+    alert('Whisper 回了 200 但沒文字：\n' + JSON.stringify(data, null, 2));
+    resetMicBtn();
+    return;
+  }
+
+  // 塞進輸入框、user 自己決定要不要再修 / 送
+  textInput.value = (textInput.value ? textInput.value + ' ' : '') + data.text;
+  textInput.dispatchEvent(new Event('input'));
+  textInput.focus();
+  resetMicBtn();
 }
 
 function resetMicBtn() {
