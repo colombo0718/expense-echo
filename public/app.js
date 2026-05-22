@@ -285,26 +285,49 @@ async function startRecording() {
     alert('這個瀏覽器不支援錄音、用打字或拍照吧～');
     return;
   }
+
+  // 中間態：等系統權限對話框
+  actionBtn.classList.remove('send-mode');
+  actionBtn.classList.add('busy');
+  actionBtn.textContent = '⋯';
+  actionBtn.title = '等麥克風權限⋯';
+
   try {
     recordingStream = await navigator.mediaDevices.getUserMedia({ audio: true });
   } catch (err) {
-    alert('沒拿到麥克風權限、檢查瀏覽器設定～');
+    actionBtn.classList.remove('busy');
+    refreshActionBtn();
+    const msg = err?.name || err?.message || String(err);
+    alert('麥克風無法啟動：' + msg + '\n（檢查瀏覽器網址列旁的權限設定）');
     return;
   }
+
   const mime = pickAudioMime();
   const options = mime ? { mimeType: mime } : undefined;
   try {
     mediaRecorder = new MediaRecorder(recordingStream, options);
   } catch {
-    mediaRecorder = new MediaRecorder(recordingStream);
+    try {
+      mediaRecorder = new MediaRecorder(recordingStream);
+    } catch (err) {
+      recordingStream.getTracks().forEach((t) => t.stop());
+      recordingStream = null;
+      actionBtn.classList.remove('busy');
+      refreshActionBtn();
+      alert('MediaRecorder 啟動失敗：' + (err?.message || err));
+      return;
+    }
   }
+
   recordedChunks = [];
   mediaRecorder.addEventListener('dataavailable', (e) => {
     if (e.data && e.data.size > 0) recordedChunks.push(e.data);
   });
   mediaRecorder.addEventListener('stop', handleRecordingStop);
   mediaRecorder.start();
-  actionBtn.classList.remove('send-mode');
+
+  // 拿到 permission、進真正錄音狀態
+  actionBtn.classList.remove('busy');
   actionBtn.classList.add('recording');
   actionBtn.textContent = '⏹';
   actionBtn.title = '再按一下停止';
