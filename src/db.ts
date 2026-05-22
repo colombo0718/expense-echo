@@ -1,4 +1,4 @@
-import type { User, AiRunLog, GoogleUserInfo } from './types';
+import type { User, AiRunLog, GoogleUserInfo, ChatMessage } from './types';
 
 export interface ExpenseRow {
   user_id: string;
@@ -115,4 +115,62 @@ export async function logAiRun(db: D1Database, run: AiRunLog): Promise<void> {
       run.error ?? null
     )
     .run();
+}
+
+export async function insertChat(db: D1Database, msg: ChatMessage): Promise<number> {
+  const result = await db
+    .prepare(
+      `INSERT INTO chats (user_id, role, msg_type, content, payload, expense_id)
+       VALUES (?, ?, ?, ?, ?, ?)`
+    )
+    .bind(
+      msg.user_id,
+      msg.role,
+      msg.msg_type,
+      msg.content ?? null,
+      msg.payload ?? null,
+      msg.expense_id ?? null
+    )
+    .run();
+  return result.meta.last_row_id as number;
+}
+
+export async function listRecentChats(db: D1Database, userId: string, limit = 50) {
+  const { results } = await db
+    .prepare(
+      `SELECT id, role, msg_type, content, payload, expense_id, ts
+         FROM chats
+        WHERE user_id = ?
+        ORDER BY ts DESC, id DESC
+        LIMIT ?`
+    )
+    .bind(userId, limit)
+    .all();
+  return (results as any[]).reverse();
+}
+
+export async function getTodayTotal(db: D1Database, userId: string): Promise<number> {
+  const row = await db
+    .prepare(
+      `SELECT COALESCE(SUM(amount), 0) AS total
+         FROM expenses
+        WHERE user_id = ?
+          AND ts >= unixepoch('now', 'start of day', 'utc')`
+    )
+    .bind(userId)
+    .first<{ total: number }>();
+  return row?.total ?? 0;
+}
+
+export async function getMonthTotal(db: D1Database, userId: string): Promise<number> {
+  const row = await db
+    .prepare(
+      `SELECT COALESCE(SUM(amount), 0) AS total
+         FROM expenses
+        WHERE user_id = ?
+          AND ts >= unixepoch('now', 'start of month', 'utc')`
+    )
+    .bind(userId)
+    .first<{ total: number }>();
+  return row?.total ?? 0;
 }

@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS ai_runs (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id TEXT REFERENCES users(id),
   model TEXT NOT NULL,                          -- '@cf/meta/llama-3.2-11b-vision-instruct' 等
-  task TEXT NOT NULL,                           -- 'vision' | 'text'
+  task TEXT NOT NULL,                           -- 'vision' | 'text' | 'persona'
   latency_ms INTEGER,
   neurons REAL,
   ok INTEGER NOT NULL,                          -- 1 / 0
@@ -54,3 +54,16 @@ CREATE TABLE IF NOT EXISTS ai_runs (
 );
 CREATE INDEX IF NOT EXISTS idx_ai_runs_ts ON ai_runs(ts DESC);
 CREATE INDEX IF NOT EXISTS idx_ai_runs_model_task ON ai_runs(model, task);
+
+-- 對話歷史（v0.2.0、chat-first、跨 session 記憶）
+CREATE TABLE IF NOT EXISTS chats (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id TEXT NOT NULL REFERENCES users(id),
+  role TEXT NOT NULL,                           -- 'user' | 'yiyi' | 'system'
+  msg_type TEXT NOT NULL,                       -- 'text' | 'image' | 'result'
+  content TEXT,                                 -- 文字內容 / image_key / 系統訊息
+  payload TEXT,                                 -- JSON（結構化 result / chart spec 等）
+  expense_id INTEGER REFERENCES expenses(id),   -- 若此訊息產生了 expense
+  ts INTEGER NOT NULL DEFAULT (unixepoch())
+);
+CREATE INDEX IF NOT EXISTS idx_chats_user_ts ON chats(user_id, ts);

@@ -39,11 +39,22 @@ export interface ParsedExpense {
 export interface AiRunLog {
   user_id: string | null;
   model: string;
-  task: 'vision' | 'text';
+  task: 'vision' | 'text' | 'persona';
   latency_ms: number;
   neurons?: number;
   ok: boolean;
   error?: string;
+}
+
+export interface ChatMessage {
+  id?: number;
+  user_id: string;
+  role: 'user' | 'yiyi' | 'system';
+  msg_type: 'text' | 'image' | 'result';
+  content?: string | null;
+  payload?: string | null;
+  expense_id?: number | null;
+  ts?: number;
 }
 
 export interface GoogleUserInfo {

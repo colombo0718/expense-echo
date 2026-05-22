@@ -7,48 +7,36 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧮</text></svg>" />
   <link rel="stylesheet" href="/styles.css" />
 </head>
-<body>
-  <header class="topbar">
-    <h1>Expense Echo</h1>
-    <div class="user-area">
-      <span id="user-label">…</span>
-      <button id="logout-btn" type="button">登出</button>
+<body class="chat-page">
+  <header class="chat-header">
+    <div class="header-left">
+      <div class="yiyi-avatar">🧮</div>
+      <div class="header-titles">
+        <div class="header-name">依依</div>
+        <div class="header-status">對金錢鬆弛 · 對工資計較 · 替你看著</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <span id="user-label" class="user-label">…</span>
+      <button id="logout-btn" type="button" class="ghost">登出</button>
     </div>
   </header>
 
-  <main>
-    <section class="card">
-      <h2>文字記帳</h2>
-      <form id="text-form">
-        <input
-          type="text"
-          id="text-input"
-          placeholder="例如：便當 90、7-11 飲料 30"
-          autocomplete="off"
-          required
-        />
-        <button type="submit">記帳</button>
-      </form>
-    </section>
-
-    <section class="card">
-      <h2>收據拍照</h2>
-      <form id="image-form">
-        <input type="file" id="image-input" accept="image/*" capture="environment" required />
-        <button type="submit">上傳解析</button>
-      </form>
-    </section>
-
-    <section class="card">
-      <h2>結果</h2>
-      <div id="result" class="result-area">尚無紀錄。</div>
-    </section>
-
-    <section class="card">
-      <h2>最近的紀錄</h2>
-      <ul id="recent" class="recent-list">載入中…</ul>
-    </section>
+  <main id="chat-thread" class="chat-thread" aria-live="polite">
+    <div class="loading">載入對話中⋯⋯</div>
   </main>
+
+  <footer class="chat-input-bar">
+    <label for="image-input" class="image-btn" title="拍 / 選收據">📷</label>
+    <input type="file" id="image-input" accept="image/*" capture="environment" hidden />
+    <textarea
+      id="text-input"
+      placeholder="跟依依說一句話、或點 📷 傳收據"
+      rows="1"
+      autocomplete="off"
+    ></textarea>
+    <button id="send-btn" type="button" class="send-btn">傳送</button>
+  </footer>
 
   <script src="/app.js" type="module"></script>
 </body>

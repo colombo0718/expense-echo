@@ -1,5 +1,40 @@
 # CHANGELOG
 
+## [0.2.0-alpha] - 2026-05-22（chat-first MVP、雙層 LLM 上線）
+
+### 新增
+- 🧮 favicon（依依算盤）+ 兩頁 title 改「Expense Echo · 依依」
+- `docs/strategy.md` EE 戰略憲法（13 段）
+- `docs/v0.2.0-chat-first-yiyi.md` 施工計畫
+- D1 `chats` 表（跨 session 對話歷史、local + remote 上線）
+- `src/yiyi.ts` 人格層 LLM、寫死「守財奴依依」system prompt（奴家 / 公子姑娘 / 慵懶語氣）
+- `functions/api/chat.ts` 雙層 LLM orchestrator
+  - Step 1：數據層 LLM（text/vision parser）→ JSON
+  - Step 2：人格層 LLM（依依）→ 自然語言
+  - 每層 latency + ok / error 寫 `ai_runs`
+- `functions/api/chats.ts` 列對話歷史
+- `ai_runs.task` 新增 `'persona'` 類別
+- 前端 chat-first 改版：
+  - `public/index.html` 改為 chat thread layout（header / thread / input bar）
+  - `public/app.js` 重寫為 message renderer + send loop（text + image）
+  - `public/styles.css` chat bubble + 草綠/淡金配色 + dark mode + RWD
+- 訊息類型：`user_text` / `user_image` / `yiyi_text` / `result`（依依的「結果卡」）
+
+### 設計原則釐清
+- 依依態度走「**default 人格鎖定**」、不做動態：
+  - 動態態度需 RL 三件套（reward × state × action）
+  - 當前缺 reward（付費通道）+ state（tier 維度殘缺）
+  - 等 v0.3.0+ 補齊再做 dynamic policy
+
+### 待補 / 待測
+- ⏳ E2E 實測（登入 → 文字記帳 → 依依回應 → 拍照 → 依依解析 → 重整保留歷史）
+- ⏳ 期末實驗 track：vision 壓測 + controlled prompt perturbation + slide
+- ⏳ 補 GCP 剩 5 條 redirect URI
+- ⏳ CF Pages Preview 環境 secrets
+
+---
+
+
 ## [0.1.0] - 2026-05-21（文字路徑 E2E 通、圖片路徑待驗）
 
 ### 破壞性變更
