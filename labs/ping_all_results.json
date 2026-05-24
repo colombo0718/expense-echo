@@ -1,0 +1,578 @@
+[
+  {
+    "name": "@cf/openai/gpt-oss-120b",
+    "description": "OpenAI’s open-weight models designed for powerful reasoning, agentic tasks, and ",
+    "ok": true,
+    "status": 200,
+    "ms": 4270,
+    "resp": "{\"id\": \"chatcmpl-0c3bc82083174fb481a9c2631a9fef7e\", \"object\": \"chat.completion\", \"created\": 1779544818, \"model\": \"@cf/op",
+    "usage": {
+      "prompt_tokens": 82,
+      "completion_tokens": 128,
+      "total_tokens": 210,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    }
+  },
+  {
+    "name": "@cf/google/gemma-2b-it-lora",
+    "description": "This is a Gemma-2B base model that Cloudflare dedicates for inference with LoRA ",
+    "ok": true,
+    "status": 200,
+    "ms": 2889,
+    "resp": "Sure, \"便當 90\" means \"a delicious breakfast\" in Chinese.",
+    "usage": {
+      "prompt_tokens": 31,
+      "completion_tokens": 19,
+      "total_tokens": 50,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    }
+  },
+  {
+    "name": "@cf/meta/llama-3-8b-instruct",
+    "description": "Generation over generation, Meta Llama 3 demonstrates state-of-the-art performan",
+    "ok": true,
+    "status": 200,
+    "ms": 2434,
+    "resp": "便當的價格是90元？",
+    "usage": {
+      "prompt_tokens": 26,
+      "completion_tokens": 10,
+      "total_tokens": 36,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    }
+  },
+  {
+    "name": "@cf/meta/llama-3.2-3b-instruct",
+    "description": "The Llama 3.2 instruction-tuned text only models are optimized for multilingual ",
+    "ok": true,
+    "status": 200,
+    "ms": 1954,
+    "resp": "你想说的是 \"便当90\"，意思是你有 90 个便当。",
+    "usage": {
+      "prompt_tokens": 46,
+      "completion_tokens": 21,
+      "total_tokens": 67,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    }
+  },
+  {
+    "name": "@cf/moonshotai/kimi-k2.5",
+    "description": "Kimi K2.5 is a frontier-scale open-source model with a 256k context window, mult",
+    "ok": true,
+    "status": 200,
+    "ms": 3645,
+    "resp": "{\"choices\": [{\"finish_reason\": \"length\", \"index\": 0, \"logprobs\": null, \"matched_stop\": null, \"message\": {\"content\": null",
+    "usage": {
+      "prompt_tokens": 22,
+      "completion_tokens": 128,
+      "total_tokens": 150,
+      "prompt_tokens_details": {
+        "cached_tokens": 3
+      }
+    }
+  },
+  {
+    "name": "@cf/meta/llama-guard-3-8b",
+    "description": "Llama Guard 3 is a Llama-3.1-8B pretrained model, fine-tuned for content safety ",
+    "ok": false,
+    "status": 400,
+    "ms": 1292,
+    "err": "{\"errors\":[{\"message\":\"AiError: Bad input: Error: enum system not in user,assistant at '/messages/0/role' (f7d41829-1798-4226-b16d-e5deef3a012a)\",\"code\":5006}],"
+  },
+  {
+    "name": "@cf/meta/llama-2-7b-chat-fp16",
+    "description": "Full precision (fp16) generative text model with 7 billion parameters from Meta",
+    "ok": true,
+    "status": 200,
+    "ms": 4592,
+    "resp": "  Sure! Here's a Chinese phrase for \"Thank you very much\":\n\n谢谢 (xiè xiè)",
+    "usage": {
+      "prompt_tokens": 42,
+      "completion_tokens": 32,
+      "total_tokens": 74,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    }
+  },
+  {
+    "name": "@cf/mistral/mistral-7b-instruct-v0.1",
+    "description": "Instruct fine-tuned version of the Mistral-7b generative text model with 7 billi",
+    "ok": true,
+    "status": 200,
+    "ms": 3244,
+    "resp": " 你的便当中有九十个食物片段。(Your bentou has ninety food pieces.)",
+    "usage": {
+      "prompt_tokens": 21,
+      "completion_tokens": 27,
+      "total_tokens": 48,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    }
+  },
+  {
+    "name": "@cf/mistral/mistral-7b-instruct-v0.2-lora",
+    "description": "The Mistral-7B-Instruct-v0.2 Large Language Model (LLM) is an instruct fine-tune",
+    "ok": true,
+    "status": 200,
+    "ms": 3163,
+    "resp": " 你的便当中有九十个食物片段。(Your bentou has ninety food pieces.)",
+    "usage": {
+      "prompt_tokens": 21,
+      "completion_tokens": 27,
+      "total_tokens": 48,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    }
+  },
+  {
+    "name": "@hf/mistral/mistral-7b-instruct-v0.2",
+    "description": "The Mistral-7B-Instruct-v0.2 Large Language Model (LLM) is an instruct fine-tune",
+    "ok": true,
+    "status": 200,
+    "ms": 2938,
+    "resp": " 你的便当中有九十个食物片段。(Your bentou has ninety food pieces.)",
+    "usage": {
+      "prompt_tokens": 21,
+      "completion_tokens": 27,
+      "total_tokens": 48,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    }
+  },
+  {
+    "name": "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b",
+    "description": "DeepSeek-R1-Distill-Qwen-32B is a model distilled from DeepSeek-R1 based on Qwen",
+    "ok": true,
+    "status": 200,
+    "ms": 4330,
+    "resp": "<think>\n好的，我现在需要分析用户的查询。用户说：“回一句中文即可。 便當 90”。看起来用户是在测试我的回应，要求我只用中文回复。用户提到了“便當 90”，这可能是指便当的价格是90元，或者是某种编号。\n\n首先，我需要确定用户的意图",
+    "usage": {
+      "prompt_tokens": 19,
+      "completion_tokens": 128,
+      "total_tokens": 147,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    }
+  },
+  {
+    "name": "@cf/meta/llama-2-7b-chat-int8",
+    "description": "Quantized (int8) generative text model with 7 billion parameters from Meta",
+    "ok": true,
+    "status": 200,
+    "ms": 1692,
+    "resp": "😊",
+    "usage": {
+      "prompt_tokens": 27,
+      "completion_tokens": 3,
+      "total_tokens": 30,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    }
+  },
+  {
+    "name": "@cf/meta/llama-3.1-8b-instruct-fp8",
+    "description": "Llama 3.1 8B quantized to FP8 precision",
+    "ok": true,
+    "status": 200,
+    "ms": 3742,
+    "resp": "便當（日语：）是日本的一種便食，通常是用盒子裝著的熱食。",
+    "usage": {
+      "prompt_tokens": 27,
+      "completion_tokens": 26,
+      "total_tokens": 53,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    }
+  },
+  {
+    "name": "@cf/meta/llama-3.2-1b-instruct",
+    "description": "The Llama 3.2 instruction-tuned text only models are optimized for multilingual ",
+    "ok": true,
+    "status": 200,
+    "ms": 2870,
+    "resp": "在日本，90的意思是“好”或“很好”。",
+    "usage": {
+      "prompt_tokens": 27,
+      "completion_tokens": 16,
+      "total_tokens": 43,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    }
+  },
+  {
+    "name": "@cf/moonshotai/kimi-k2.6",
+    "description": "Kimi K2.6 is a frontier-scale open-source 1T parameter model with a 262.1k conte",
+    "ok": true,
+    "status": 200,
+    "ms": 3582,
+    "resp": "{\"choices\": [{\"finish_reason\": \"length\", \"index\": 0, \"logprobs\": null, \"matched_stop\": null, \"message\": {\"content\": null",
+    "usage": {
+      "prompt_tokens": 22,
+      "completion_tokens": 128,
+      "total_tokens": 150,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    }
+  },
+  {
+    "name": "@cf/zai-org/glm-4.7-flash",
+    "description": "GLM-4.7-Flash is a fast and efficient multilingual text generation model with a ",
+    "ok": true,
+    "status": 200,
+    "ms": 2197,
+    "resp": "{\"id\": \"chatcmpl-b5a6bd3e2d05fdc3\", \"object\": \"chat.completion\", \"created\": 1779544863, \"model\": \"@cf/zai-org/glm-4.7-fl",
+    "usage": {
+      "prompt_tokens": 15,
+      "completion_tokens": 128,
+      "total_tokens": 143,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    }
+  },
+  {
+    "name": "@cf/meta-llama/llama-2-7b-chat-hf-lora",
+    "description": "This is a Llama2 base model that Cloudflare dedicated for inference with LoRA ad",
+    "ok": true,
+    "status": 200,
+    "ms": 8926,
+    "resp": "{\"response\": \"\", \"usage\": {\"prompt_tokens\": 42, \"completion_tokens\": 128, \"total_tokens\": 170, \"prompt_tokens_details\": ",
+    "usage": {
+      "prompt_tokens": 42,
+      "completion_tokens": 128,
+      "total_tokens": 170,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    }
+  },
+  {
+    "name": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "description": "Llama 3.3 70B quantized to fp8 precision, optimized to be faster.",
+    "ok": true,
+    "status": 200,
+    "ms": 1822,
+    "resp": "90 元的便當真划算！",
+    "usage": {
+      "prompt_tokens": 46,
+      "completion_tokens": 10,
+      "total_tokens": 56,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    }
+  },
+  {
+    "name": "@cf/ibm-granite/granite-4.0-h-micro",
+    "description": "Granite 4.0 instruct models deliver strong performance across benchmarks, achiev",
+    "ok": true,
+    "status": 200,
+    "ms": 1882,
+    "resp": "{\"id\": \"chatcmpl-1c69d153139742dd9ed9133308ca6784\", \"object\": \"chat.completion\", \"created\": 1779544876, \"model\": \"@cf/ib",
+    "usage": {
+      "prompt_tokens": 28,
+      "completion_tokens": 14,
+      "total_tokens": 42,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    }
+  },
+  {
+    "name": "@cf/qwen/qwen2.5-coder-32b-instruct",
+    "description": "Qwen2.5-Coder is the latest series of Code-Specific Qwen large language models (",
+    "ok": true,
+    "status": 200,
+    "ms": 1706,
+    "resp": "好的，便當90元。",
+    "usage": {
+      "prompt_tokens": 23,
+      "completion_tokens": 9,
+      "total_tokens": 32,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    }
+  },
+  {
+    "name": "@hf/nousresearch/hermes-2-pro-mistral-7b",
+    "description": "Hermes 2 Pro on Mistral 7B is the new flagship 7B Hermes! Hermes 2 Pro is an upg",
+    "ok": true,
+    "status": 200,
+    "ms": 1455,
+    "resp": "便当90。",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    }
+  },
+  {
+    "name": "@cf/nvidia/nemotron-3-120b-a12b",
+    "description": "NVIDIA Nemotron 3 Super is a hybrid MoE model with leading accuracy for multi-ag",
+    "ok": true,
+    "status": 200,
+    "ms": 4728,
+    "resp": "{\"id\": \"chatcmpl-9cfb53c4c16f7aaa\", \"object\": \"chat.completion\", \"created\": 1779544881, \"model\": \"@cf/nvidia/nemotron-3-",
+    "usage": {
+      "prompt_tokens": 29,
+      "completion_tokens": 128,
+      "total_tokens": 157,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    }
+  },
+  {
+    "name": "@cf/aisingapore/gemma-sea-lion-v4-27b-it",
+    "description": "SEA-LION stands for Southeast Asian Languages In One Network, which is a collect",
+    "ok": true,
+    "status": 200,
+    "ms": 1097,
+    "resp": "{\"id\": \"chatcmpl-94396812b19247fe874cfe34812433b5\", \"object\": \"chat.completion\", \"created\": 1779544885, \"model\": \"@cf/ai",
+    "usage": {
+      "prompt_tokens": 20,
+      "completion_tokens": 10,
+      "total_tokens": 30,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    }
+  },
+  {
+    "name": "@cf/qwen/qwen3-30b-a3b-fp8",
+    "description": "Qwen3 is the latest generation of large language models in Qwen series, offering",
+    "ok": true,
+    "status": 200,
+    "ms": 2718,
+    "resp": "{\"id\": \"chatcmpl-9b018793d94342369b21b0ebea8a8285\", \"object\": \"chat.completion\", \"created\": 1779544887, \"model\": \"@cf/qw",
+    "usage": {
+      "prompt_tokens": 23,
+      "completion_tokens": 128,
+      "total_tokens": 151,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    }
+  },
+  {
+    "name": "@cf/meta/llama-3.1-8b-instruct-awq",
+    "description": "Quantized (int4) generative text model with 8 billion parameters from Meta.\n",
+    "ok": true,
+    "status": 200,
+    "ms": 2133,
+    "resp": "便當是日本的便當盒，通常是用紙盒或塑膠盒裝的食物，通常是熱食。",
+    "usage": {
+      "prompt_tokens": 27,
+      "completion_tokens": 30,
+      "total_tokens": 57,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    }
+  },
+  {
+    "name": "@cf/google/gemma-7b-it-lora",
+    "description": "  This is a Gemma-7B base model that Cloudflare dedicates for inference with LoR",
+    "ok": true,
+    "status": 200,
+    "ms": 10742,
+    "resp": "便當 90 是指用 90 公升的便當，主要是在台灣地區使用。\n\n**規格：**\n\n* 尺寸：約 30x20x10 公分\n* 重量：約 1 公斤\n* 材質：通常使用紙包或塑膠\n* 內含：飯、肉、蔬菜、水果、蛋等\n\n**主要成分：**\n\n* 飯",
+    "usage": {
+      "prompt_tokens": 14,
+      "completion_tokens": 128,
+      "total_tokens": 142,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    }
+  },
+  {
+    "name": "@cf/google/gemma-4-26b-a4b-it",
+    "description": "Gemma 4 is Google's most intelligent family of open models, built from Gemini 3 ",
+    "ok": true,
+    "status": 200,
+    "ms": 2569,
+    "resp": "{\"choices\": [{\"finish_reason\": \"length\", \"index\": 0, \"logprobs\": null, \"message\": {\"annotations\": null, \"audio\": null, \"",
+    "usage": {
+      "prompt_tokens": 27,
+      "completion_tokens": 128,
+      "total_tokens": 155,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    }
+  },
+  {
+    "name": "@cf/mistralai/mistral-small-3.1-24b-instruct",
+    "description": "Building upon Mistral Small 3 (2501), Mistral Small 3.1 (2503) adds state-of-the",
+    "ok": true,
+    "status": 200,
+    "ms": 1613,
+    "resp": "便當90元。",
+    "usage": {
+      "prompt_tokens": 18,
+      "completion_tokens": 7,
+      "total_tokens": 25,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    }
+  },
+  {
+    "name": "@cf/meta/llama-3-8b-instruct-awq",
+    "description": "Quantized (int4) generative text model with 8 billion parameters from Meta.",
+    "ok": true,
+    "status": 200,
+    "ms": 1736,
+    "resp": "😊",
+    "usage": {
+      "prompt_tokens": 27,
+      "completion_tokens": 3,
+      "total_tokens": 30,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    }
+  },
+  {
+    "name": "@cf/meta/llama-3.2-11b-vision-instruct",
+    "description": " The Llama 3.2-Vision instruction-tuned models are optimized for visual recognit",
+    "ok": false,
+    "status": 403,
+    "ms": 1256,
+    "err": "{\"errors\":[{\"message\":\"AiError: Model Agreement: Prior to using this model, you must submit the prompt 'agree'. By submitting ‘agree’, you  hereby agree to the "
+  },
+  {
+    "name": "@cf/defog/sqlcoder-7b-2",
+    "description": "This model is intended to be used by non-technical users to understand data insi",
+    "ok": true,
+    "status": 200,
+    "ms": 2063,
+    "resp": " SELECT * FROM products p WHERE p.price > 90;",
+    "usage": {
+      "prompt_tokens": 102,
+      "completion_tokens": 15,
+      "total_tokens": 117,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    }
+  },
+  {
+    "name": "@cf/microsoft/phi-2",
+    "description": "Phi-2 is a Transformer-based model with a next-word prediction objective, traine",
+    "ok": true,
+    "status": 200,
+    "ms": 5043,
+    "resp": "    # 可以計算結果\n    # 可以計算結果\n    # 可以計算結果\n    # 可以計算結果\n    # 可以計算結果\n    # 可以計算結果\n    # 可以",
+    "usage": {
+      "prompt_tokens": 10,
+      "completion_tokens": 128,
+      "total_tokens": 138,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    }
+  },
+  {
+    "name": "@cf/openai/gpt-oss-20b",
+    "description": "OpenAI’s open-weight models designed for powerful reasoning, agentic tasks, and ",
+    "ok": true,
+    "status": 200,
+    "ms": 2177,
+    "resp": "{\"id\": \"chatcmpl-45734e1bb7f84e988ce4f01e3015ebb5\", \"object\": \"chat.completion\", \"created\": 1779544917, \"model\": \"@cf/op",
+    "usage": {
+      "prompt_tokens": 82,
+      "completion_tokens": 128,
+      "total_tokens": 210,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    }
+  },
+  {
+    "name": "@hf/google/gemma-7b-it",
+    "description": "Gemma is a family of lightweight, state-of-the-art open models from Google, buil",
+    "ok": true,
+    "status": 200,
+    "ms": 10427,
+    "resp": "便當 90 是指用 90 公升的便當，主要是在台灣地區使用。\n\n**規格：**\n\n* 尺寸：約 30x20x10 公分\n* 重量：約 1 公斤\n* 材質：通常使用紙包或塑膠\n* 內含：飯、肉、蔬菜、水果、蛋等\n\n**主要成分：**\n\n* 飯",
+    "usage": {
+      "prompt_tokens": 14,
+      "completion_tokens": 128,
+      "total_tokens": 142,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    }
+  },
+  {
+    "name": "@cf/meta/llama-4-scout-17b-16e-instruct",
+    "description": "Meta's Llama 4 Scout is a 17 billion parameter model with 16 experts that is nat",
+    "ok": true,
+    "status": 200,
+    "ms": 1346,
+    "resp": "好吃的便當",
+    "usage": {
+      "prompt_tokens": 27,
+      "completion_tokens": 5,
+      "total_tokens": 32,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    }
+  },
+  {
+    "name": "@cf/google/gemma-3-12b-it",
+    "description": "Gemma 3 models are well-suited for a variety of text generation and image unders",
+    "ok": true,
+    "status": 200,
+    "ms": 2005,
+    "resp": "九十元。\n",
+    "usage": {
+      "prompt_tokens": 20,
+      "completion_tokens": 6,
+      "total_tokens": 26,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    }
+  },
+  {
+    "name": "@cf/qwen/qwq-32b",
+    "description": "QwQ is the reasoning model of the Qwen series. Compared with conventional instru",
+    "ok": true,
+    "status": 200,
+    "ms": 5684,
+    "resp": "好的，用户发来“便當 90”，看起来像是日语的“便当90”。首先需要确定用户的具体需求。可能是指便当的制作、推荐，或者有其他含义？结合之前的指示，用户希望用中文回复，并且要简洁。可能用户想询问关于便当的建议，比如90分钟内能做的便当，或者9",
+    "usage": {
+      "prompt_tokens": 25,
+      "completion_tokens": 128,
+      "total_tokens": 153,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    }
+  }
+]

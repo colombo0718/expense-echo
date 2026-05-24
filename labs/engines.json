@@ -1,0 +1,62 @@
+{
+  "version": "2026-05-23-v1",
+  "rationale": "一公司一模型、跨 8 家、橫跨 1B → 1T 三個數量級、中文表現過 ping 篩過",
+  "engines": [
+    {
+      "company": "Meta",
+      "model": "@cf/meta/llama-3.2-1b-instruct",
+      "params_b": 1,
+      "schema": "legacy",
+      "role": "下限錨點"
+    },
+    {
+      "company": "IBM",
+      "model": "@cf/ibm-granite/granite-4.0-h-micro",
+      "params_b": 3,
+      "schema": "openai",
+      "role": "小模型 + 企業級結構化"
+    },
+    {
+      "company": "Google",
+      "model": "@cf/google/gemma-3-12b-it",
+      "params_b": 12,
+      "schema": "legacy",
+      "role": "Google 家代表"
+    },
+    {
+      "company": "Mistral",
+      "model": "@cf/mistralai/mistral-small-3.1-24b-instruct",
+      "params_b": 24,
+      "schema": "legacy",
+      "role": "歐系、看中文劣勢"
+    },
+    {
+      "company": "Qwen",
+      "model": "@cf/qwen/qwen2.5-coder-32b-instruct",
+      "params_b": 32,
+      "schema": "legacy",
+      "role": "中文 + 結構化主力"
+    },
+    {
+      "company": "DeepSeek",
+      "model": "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b",
+      "params_b": 32,
+      "schema": "legacy",
+      "role": "thinking model 對照、看推理對抽取任務是否吃虧"
+    },
+    {
+      "company": "OpenAI",
+      "model": "@cf/openai/gpt-oss-120b",
+      "params_b": 120,
+      "schema": "openai",
+      "role": "OpenAI 家旗艦"
+    },
+    {
+      "company": "Moonshot",
+      "model": "@cf/moonshotai/kimi-k2.6",
+      "params_b": 1000,
+      "schema": "openai",
+      "role": "上限錨點 / 依依本命"
+    }
+  ]
+}

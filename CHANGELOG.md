@@ -1,5 +1,43 @@
 # CHANGELOG
 
+## [0.3.0] - 2026-05-24 開規劃（待施工、待綠界憑證 + 貼圖定稿）
+
+### 戰略決策
+- 走**打賞制、不走訂閱**（依依「對工資計較」character beat 商業 mechanism 化）
+- 「**付費 = 功能升級**」為主、貼圖是情緒附加（colombo 拍板）
+- 5 檔層位 + 自訂金額：☕飲料 / 🛍️搓手指 / 🎁禮物 / ✈️飛機 / 🚢郵輪
+- 永久 pro 門檻：單筆 NT$ 10000+ 或累積 NT$ 5000
+- 法律：走標準商品交易 + 自動電子發票（綠界模組）、商品名「依依の紀念禮 - X 款」
+- 金流：綠界 ECPay（葉與月工作室統編）、未來 LL 全宇宙共用
+- 貼圖：colombo 親手用 Gemini Nano Banana sweep + Imagen 4 定稿
+- PLG 觸發：靜態套路（寬鬆期 7 天 + 感恩冷卻 7 天 + LTV 稱呼）、v0.6+ RL 接管
+
+### 戰略文件（已完）
+- `docs/payment-strategy.md` 金流戰略憲法
+- `docs/v0.3.0-donation-and-payment.md` 施工計畫 PLAN
+- `docs/yiyi-sticker-prompt-templates.md` Gemini 生圖 prompt 模板
+- `docs/strategy.md` §十二 Roadmap 更新
+
+### 待施工（9 步）
+1. 綠界商家申請（colombo 經手、3-7 天審）
+2. Gemini 生圖 5 張（colombo 親審、半小時）
+3. schema v2（donations / unlock_grants / sticker_collection + users 擴欄）
+4. 綠界 SDK（src/payment/ecpay.ts、CheckMacValue 簽章）
+5. API endpoints（/api/donate/* + /api/me/{unlocks,stickers,pro-progress}）
+6. 依依 system prompt 加打賞段（5 檔台詞 + PLG 邏輯）
+7. UI：打賞按鈕 + 5 檔 + 自訂金額 + 進度條 + paywall
+8. 進階功能解鎖 gate（前後端）
+9. E2E + 真實付款測 + ship
+
+### Out of scope（v0.3.0 不做）
+- 訂閱月費（永不做）
+- LINE OA / LinePay native（v0.4+）
+- Stripe 國際支付（v0.4+ 評估）
+- 寵物 mechanic（v0.5+、lore 留種）
+- RL policy 學習（v0.6+）
+
+---
+
 ## [0.2.0-alpha] - 2026-05-22（chat-first MVP、雙層 LLM 上線）
 
 ### 新增

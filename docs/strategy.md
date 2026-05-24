@@ -387,14 +387,24 @@ EE / 任何 LL AI 應用、強制分三層、各司其職：
 | Phase | 目標 | 狀態 |
 |-------|------|------|
 | **v0.1.0** | 拔 LINE、web + OAuth、文字記帳 E2E、infra 跑通 | ✅ 2026-05-21 ship |
-| **v0.2.0** | chat-first refactor、依依人格接 AA、動態心情 mechanism v0、PLG 漏斗 | 🟡 規劃中、待 character bible 對齊 |
-| **v0.3.0** | RL log schema 完整、interactions / experiments / outcomes 表、bandit 雛形 | ⏳ |
-| **v0.4.0** | RR/TT 接口、依依的「投資績效」進 EE dashboard | ⏳ |
-| **v0.5.0** | agent-stream 直播首播《依依的投資日記》 | ⏳ |
-| **v1.0.0** | 個人 pro tier 正式收費、第一筆營收 | ⏳ |
-| **v2.0.0** | B2B team pro 上線 | ⏳ |
+| **v0.2.0** | chat-first refactor、依依人格接 AA（Kimi-k2.6）、跨裝置同步 | ✅ 2026-05-22 ship |
+| **v0.2.5** | tier-aware routing（待 EE 實驗員 engine × harness 結果回來）| ⏳ 並行、實驗員主導 |
+| **v0.3.0** | **打賞 + 5 檔 + 功能解鎖 + 永久 pro + 5 張貼圖 + 綠界接金流**、依依「對工資計較」beat 商業 mechanism 化、第一筆營收 | 🟡 規劃中（payment-strategy + v0.3.0 PLAN + sticker prompts 已完）|
+| **v0.3.5** | AA repo 依依貼圖 visual-spec 細化、節日 / 紀念貼圖擴充 | ⏳ |
+| **v0.4.0** | vision 層 tier-aware routing 真實作 + Stripe 國際支線 + LINE OA 評估 | ⏳ |
+| **v0.4.5** | LINE OA 接入 + LINE 貼圖商店上架（若 v0.4 評估通過）| ⏳ |
+| **v0.5.0** | 寵物 mechanic 重啟（小葉 / 小月 IP 落地、進化系統）+ agent-stream 直播《依依的投資日記》 | ⏳ |
+| **v0.6.0+** | RL policy 接管依依主動催打賞策略（RL 三件套齊備）| ⏳ |
+| **v1.0.0** | 正式對外營收穩定、AA repo 9 角色完整、跨平台 narrative 跑通 | ⏳ |
+| **v2.0.0** | B2B AI 會計版 / 家庭共用帳本 | ⏳ |
 
-→ v0.2.0 是下一個重大里程碑、要從 form-style 到 chat-first 整個翻過來。
+→ **下一個重大里程碑：v0.3.0 ship、收第一筆營收**。
+→ 跟 v0.2.5（實驗員主導、不阻塞公關長）並行推進。
+
+→ 對應戰略文件：
+- 金流：[`payment-strategy.md`](payment-strategy.md)
+- v0.3.0 施工計畫：[`v0.3.0-donation-and-payment.md`](v0.3.0-donation-and-payment.md)
+- Gemini 生圖：[`yiyi-sticker-prompt-templates.md`](yiyi-sticker-prompt-templates.md)
 
 ---
 
