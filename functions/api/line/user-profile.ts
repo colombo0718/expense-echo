@@ -57,7 +57,7 @@ export const onRequestPost: PagesFunction<Env & { LINE_BRIDGE_TOKEN: string }> =
 }) => {
   if (!authed(request, env)) return json({ error: 'unauthorized' }, 401);
 
-  let body: { line_user_id?: string; salutation?: string };
+  let body: { line_user_id?: string; salutation?: string; display_name?: string | null };
   try {
     body = (await request.json()) as typeof body;
   } catch {
@@ -65,19 +65,29 @@ export const onRequestPost: PagesFunction<Env & { LINE_BRIDGE_TOKEN: string }> =
   }
 
   if (!body.line_user_id) return json({ error: 'missing line_user_id' }, 400);
-  // salutation 可為空字串（代表清掉、用戶不想設）
   const salutation = (body.salutation ?? '').trim() || null;
+  const display_name = (body.display_name ?? '').trim() || null;
 
-  // 找 user（必須已存在、line OA bridge 進來都會先 upsert）
+  // UPSERT: 用戶不存在就建（VIP 識別場景：bridge 拿到 displayName 比對通過、要先建 row 再設 salutation）
   const user = await env.DB.prepare(`SELECT id FROM users WHERE line_user_id = ?`)
     .bind(body.line_user_id)
     .first<{ id: string }>();
 
-  if (!user) return json({ error: 'user_not_found' }, 404);
+  if (!user) {
+    const id = crypto.randomUUID();
+    const syntheticEmail = `line:${body.line_user_id}@line.local`;
+    await env.DB.prepare(
+      `INSERT INTO users (id, email, name, tier, entry_source, line_user_id, salutation)
+       VALUES (?, ?, ?, 'free', 'line', ?, ?)`
+    )
+      .bind(id, syntheticEmail, display_name, body.line_user_id, salutation)
+      .run();
+    return json({ ok: true, created: true, salutation });
+  }
 
-  await env.DB.prepare(`UPDATE users SET salutation = ? WHERE id = ?`)
-    .bind(salutation, user.id)
+  await env.DB.prepare(`UPDATE users SET salutation = ?, name = COALESCE(?, name) WHERE id = ?`)
+    .bind(salutation, display_name, user.id)
     .run();
 
-  return json({ ok: true, salutation });
+  return json({ ok: true, created: false, salutation });
 };
