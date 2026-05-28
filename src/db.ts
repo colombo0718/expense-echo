@@ -9,6 +9,15 @@ export interface ExpenseRow {
   items?: string | null;
   raw_text?: string | null;
   image_key?: string | null;
+  kind?: 'expense' | 'income';
+}
+
+export interface ExpensePatch {
+  amount?: number;
+  category?: string | null;
+  vendor?: string | null;
+  items?: string | null;
+  kind?: 'expense' | 'income';
 }
 
 export async function upsertUserFromGoogle(db: D1Database, info: GoogleUserInfo): Promise<User> {
@@ -55,8 +64,8 @@ export async function upsertUserFromGoogle(db: D1Database, info: GoogleUserInfo)
 export async function saveExpense(db: D1Database, row: ExpenseRow): Promise<number> {
   const result = await db
     .prepare(
-      `INSERT INTO expenses (user_id, amount, currency, category, vendor, items, raw_text, image_key)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+      `INSERT INTO expenses (user_id, amount, currency, category, vendor, items, raw_text, image_key, kind)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
     )
     .bind(
       row.user_id,
@@ -66,7 +75,8 @@ export async function saveExpense(db: D1Database, row: ExpenseRow): Promise<numb
       row.vendor ?? null,
       row.items ?? null,
       row.raw_text ?? null,
-      row.image_key ?? null
+      row.image_key ?? null,
+      row.kind ?? 'expense'
     )
     .run();
   return result.meta.last_row_id as number;
@@ -75,7 +85,7 @@ export async function saveExpense(db: D1Database, row: ExpenseRow): Promise<numb
 export async function listRecentExpenses(db: D1Database, userId: string, limit = 20) {
   const { results } = await db
     .prepare(
-      `SELECT id, amount, currency, category, vendor, items, ts
+      `SELECT id, amount, currency, category, vendor, items, kind, ts
          FROM expenses
         WHERE user_id = ?
         ORDER BY ts DESC
@@ -84,6 +94,64 @@ export async function listRecentExpenses(db: D1Database, userId: string, limit =
     .bind(userId, limit)
     .all();
   return results;
+}
+
+export async function updateExpense(
+  db: D1Database,
+  id: number,
+  userId: string,
+  patch: ExpensePatch
+): Promise<boolean> {
+  const sets: string[] = [];
+  const vals: unknown[] = [];
+  if (patch.amount !== undefined) { sets.push('amount = ?'); vals.push(patch.amount); }
+  if (patch.category !== undefined) { sets.push('category = ?'); vals.push(patch.category); }
+  if (patch.vendor !== undefined) { sets.push('vendor = ?'); vals.push(patch.vendor); }
+  if (patch.items !== undefined) { sets.push('items = ?'); vals.push(patch.items); }
+  if (patch.kind !== undefined) { sets.push('kind = ?'); vals.push(patch.kind); }
+  if (sets.length === 0) return false;
+  vals.push(id, userId);
+  const result = await db
+    .prepare(`UPDATE expenses SET ${sets.join(', ')} WHERE id = ? AND user_id = ?`)
+    .bind(...vals)
+    .run();
+  return (result.meta.changes ?? 0) > 0;
+}
+
+export async function deleteExpense(
+  db: D1Database,
+  id: number,
+  userId: string
+): Promise<boolean> {
+  const result = await db
+    .prepare(`DELETE FROM expenses WHERE id = ? AND user_id = ?`)
+    .bind(id, userId)
+    .run();
+  return (result.meta.changes ?? 0) > 0;
+}
+
+// 找最近 N 秒內、同金額（同 kind）的紀錄 → 重複偵測用
+export async function findRecentSimilar(
+  db: D1Database,
+  userId: string,
+  amount: number,
+  kind: 'expense' | 'income',
+  withinSeconds = 300
+) {
+  const { results } = await db
+    .prepare(
+      `SELECT id, amount, vendor, items, kind, ts
+         FROM expenses
+        WHERE user_id = ?
+          AND amount = ?
+          AND kind = ?
+          AND ts >= unixepoch() - ?
+        ORDER BY ts DESC
+        LIMIT 5`
+    )
+    .bind(userId, amount, kind, withinSeconds)
+    .all();
+  return results as any[];
 }
 
 export async function sumByCategory(db: D1Database, userId: string, sinceTs: number) {
@@ -170,6 +238,7 @@ export async function getTodayTotal(db: D1Database, userId: string): Promise<num
       `SELECT COALESCE(SUM(amount), 0) AS total
          FROM expenses
         WHERE user_id = ?
+          AND kind = 'expense'
           AND ts >= unixepoch('now', 'start of day', 'utc')`
     )
     .bind(userId)
@@ -183,6 +252,21 @@ export async function getMonthTotal(db: D1Database, userId: string): Promise<num
       `SELECT COALESCE(SUM(amount), 0) AS total
          FROM expenses
         WHERE user_id = ?
+          AND kind = 'expense'
+          AND ts >= unixepoch('now', 'start of month', 'utc')`
+    )
+    .bind(userId)
+    .first<{ total: number }>();
+  return row?.total ?? 0;
+}
+
+export async function getMonthIncome(db: D1Database, userId: string): Promise<number> {
+  const row = await db
+    .prepare(
+      `SELECT COALESCE(SUM(amount), 0) AS total
+         FROM expenses
+        WHERE user_id = ?
+          AND kind = 'income'
           AND ts >= unixepoch('now', 'start of month', 'utc')`
     )
     .bind(userId)

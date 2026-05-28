@@ -1,12 +1,21 @@
 import type { Env } from '../../../src/types';
 import { upsertUserFromLine } from '../../../src/line';
-import { saveExpense, insertChat, getTodayTotal, getMonthTotal } from '../../../src/db';
+import {
+  saveExpense,
+  insertChat,
+  getTodayTotal,
+  getMonthTotal,
+  getMonthIncome,
+  findRecentSimilar,
+} from '../../../src/db';
 
 interface LineExpenseBody {
   line_user_id: string;
   display_name?: string | null;
   raw_text: string;
   reply?: string | null;
+  kind?: 'expense' | 'income';
+  skip_duplicate_check?: boolean;
   parsed: {
     amount: number;
     vendor?: string | null;
@@ -57,6 +66,15 @@ export const onRequestPost: PagesFunction<Env & { LINE_BRIDGE_TOKEN: string }> =
   });
 
   const itemsJson = body.parsed.items ? JSON.stringify(body.parsed.items) : null;
+  const kind = body.kind === 'income' ? 'income' : 'expense';
+
+  // 重複偵測：若 5 分鐘內已有同金額同 kind、回傳 recent_similar 但仍寫入
+  // 依依拿到後可依此回問「這跟剛剛那筆是同一筆嗎？」、不重複時就略過提醒
+  let recentSimilar: any[] = [];
+  if (!body.skip_duplicate_check) {
+    recentSimilar = await findRecentSimilar(env.DB, user.id, body.parsed.amount, kind, 300);
+  }
+
   const expenseId = await saveExpense(env.DB, {
     user_id: user.id,
     amount: body.parsed.amount,
@@ -64,6 +82,7 @@ export const onRequestPost: PagesFunction<Env & { LINE_BRIDGE_TOKEN: string }> =
     vendor: body.parsed.vendor ?? null,
     items: itemsJson,
     raw_text: body.raw_text,
+    kind,
   });
 
   // 寫 expenses 後手動把 source 標成 line（saveExpense 走預設值 'web'）
@@ -88,9 +107,10 @@ export const onRequestPost: PagesFunction<Env & { LINE_BRIDGE_TOKEN: string }> =
     });
   }
 
-  const [todayTotal, monthTotal] = await Promise.all([
+  const [todayTotal, monthTotal, monthIncome] = await Promise.all([
     getTodayTotal(env.DB, user.id),
     getMonthTotal(env.DB, user.id),
+    getMonthIncome(env.DB, user.id),
   ]);
 
   return new Response(
@@ -98,8 +118,12 @@ export const onRequestPost: PagesFunction<Env & { LINE_BRIDGE_TOKEN: string }> =
       ok: true,
       expense_id: expenseId,
       user_id: user.id,
+      kind,
       today_total: todayTotal,
       month_total: monthTotal,
+      month_income: monthIncome,
+      month_balance: monthIncome - monthTotal,
+      recent_similar: recentSimilar,
     }),
     { headers: { 'Content-Type': 'application/json' } }
   );
