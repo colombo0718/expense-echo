@@ -1,5 +1,5 @@
 import type { Env } from '../../../src/types';
-import { listRecentExpenses, getTodayTotal, getMonthTotal } from '../../../src/db';
+import { listRecentExpenses, getTodayTotal, getMonthTotal, getMonthIncome } from '../../../src/db';
 
 /**
  * GET /api/line/expenses?line_user_id=...&limit=20
@@ -41,10 +41,11 @@ export const onRequestGet: PagesFunction<Env & { LINE_BRIDGE_TOKEN: string }> = 
     );
   }
 
-  const [expenses, today_total, month_total] = await Promise.all([
+  const [expenses, today_total, month_total, month_income] = await Promise.all([
     listRecentExpenses(env.DB, user.id, limit),
     getTodayTotal(env.DB, user.id),
     getMonthTotal(env.DB, user.id),
+    getMonthIncome(env.DB, user.id),
   ]);
 
   return new Response(
@@ -53,6 +54,8 @@ export const onRequestGet: PagesFunction<Env & { LINE_BRIDGE_TOKEN: string }> = 
       expenses,
       today_total,
       month_total,
+      month_income,
+      month_balance: month_income - month_total,
     }),
     { headers: { 'Content-Type': 'application/json' } }
   );
