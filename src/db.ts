@@ -232,6 +232,14 @@ export async function listChatsSince(db: D1Database, userId: string, sinceId: nu
   return results as any[];
 }
 
+// 時區處理：用戶在台灣（UTC+8）、SQLite 'now' 預設 UTC。
+// 'now', '+8 hours' = 把 UTC 時間平移到台灣本地時間（仍以 UTC 字串表示）。
+// 'start of day' = 取該日 00:00（台灣的 00:00）。
+// 最後 unixepoch() 結果是「台灣午夜」對應的 UTC 秒數 - 但因為前面加了 8 小時、需要再扣回去。
+// 公式：unixepoch('now', '+8 hours', 'start of day') - 28800  (28800 = 8 * 3600)
+// 之後若要支援其他時區、把 +8 / 28800 抽成參數即可。
+const TZ_OFFSET_SECONDS = 8 * 3600;
+
 export async function getTodayTotal(db: D1Database, userId: string): Promise<number> {
   const row = await db
     .prepare(
@@ -239,9 +247,9 @@ export async function getTodayTotal(db: D1Database, userId: string): Promise<num
          FROM expenses
         WHERE user_id = ?
           AND kind = 'expense'
-          AND ts >= unixepoch('now', 'start of day', 'utc')`
+          AND ts >= unixepoch('now', '+8 hours', 'start of day') - ?`
     )
-    .bind(userId)
+    .bind(userId, TZ_OFFSET_SECONDS)
     .first<{ total: number }>();
   return row?.total ?? 0;
 }
@@ -253,9 +261,9 @@ export async function getMonthTotal(db: D1Database, userId: string): Promise<num
          FROM expenses
         WHERE user_id = ?
           AND kind = 'expense'
-          AND ts >= unixepoch('now', 'start of month', 'utc')`
+          AND ts >= unixepoch('now', '+8 hours', 'start of month') - ?`
     )
-    .bind(userId)
+    .bind(userId, TZ_OFFSET_SECONDS)
     .first<{ total: number }>();
   return row?.total ?? 0;
 }
@@ -267,9 +275,9 @@ export async function getMonthIncome(db: D1Database, userId: string): Promise<nu
          FROM expenses
         WHERE user_id = ?
           AND kind = 'income'
-          AND ts >= unixepoch('now', 'start of month', 'utc')`
+          AND ts >= unixepoch('now', '+8 hours', 'start of month') - ?`
     )
-    .bind(userId)
+    .bind(userId, TZ_OFFSET_SECONDS)
     .first<{ total: number }>();
   return row?.total ?? 0;
 }
